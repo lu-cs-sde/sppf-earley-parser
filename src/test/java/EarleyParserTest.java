@@ -16,6 +16,8 @@ public class EarleyParserTest {
 		EarleyParser parser = new EarleyParser();
 		parser.addCategory(num);
 		parser.addCategory(var);
+		parser.addCategory(plus);
+		parser.addCategory(times);
 		parser.addCategory(s);
 		parser.addCategory(p);
 		parser.addCategory(t);
@@ -31,6 +33,7 @@ public class EarleyParserTest {
 
 		System.out.println(parser);
 
-		assertEquals("Abc", parser.toString());
+		assertEquals("s -> s <+> p \ns -> p \np -> p <*> t \np -> t \nt -> <VAR> \nt -> <NUM> \n",
+				parser.toString());
 	}
 }

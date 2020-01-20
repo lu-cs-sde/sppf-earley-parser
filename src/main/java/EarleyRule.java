@@ -2,6 +2,7 @@ public class EarleyRule implements Comparable<EarleyRule> {
 	int body[];
 	int head;
 	public EarleyRule(int head, int body[]) {
+		this.head = head;
 		this.body = body;
 	}
 
