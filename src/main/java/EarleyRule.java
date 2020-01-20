@@ -1,0 +1,24 @@
+public class EarleyRule implements Comparable<EarleyRule> {
+	int body[];
+	int head;
+	public EarleyRule(int head, int body[]) {
+		this.body = body;
+	}
+
+	@Override
+	public int compareTo(EarleyRule other) {
+		for (int i = 0; i < Math.min(this.body.length, other.body.length); ++i) {
+			if (this.body[i] < other.body[i])
+				return -1;
+			else if (this.body[i] > other.body[i])
+				return 1;
+		}
+		if (this.body.length == other.body.length) {
+			return 0;
+		} else if (this.body.length < other.body.length) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+}
