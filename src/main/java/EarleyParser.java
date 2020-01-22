@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class EarleyParser {
@@ -109,6 +111,24 @@ public class EarleyParser {
 	}
 
 	class StateSet extends HashSet<EarleyItem> {
+		public StateSet(Collection<EarleyItem> c) {
+			super(c);
+		}
+
+		public StateSet() {
+			super();
+		}
+
+		public EarleyItem pickOne() {
+			Iterator<EarleyItem> it = iterator();
+			if (it.hasNext()) {
+				EarleyItem item = it.next();
+				// the following is optional, let's see if it works
+				it.remove();
+				return item;
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -207,8 +227,125 @@ public class EarleyParser {
 		int start = cat2int.get(startSymbol);
 
 		StateSet[] state = internalParse(symbols, start);
-
-
-
 	}
+
+	private boolean internalParseScott(int[] symbols, int startSymbol) {
+		StateSet[] state = new StateSet[symbols.length + 1];
+		state[0] = new StateSet();
+
+		StateSet Q_next = new StateSet();
+		HashMap<NodeLabel, SPPFNode> V = new HashMap<>();
+
+		for (EarleyRule r : rules.get(startSymbol)) {
+			state[0].add(new EarleyItem(r, 0));
+			if (!r.isEmpty() && r.body[0] == symbols[0]) {
+				Q_next.add(new EarleyItem(r, 0));
+			}
+		}
+
+		for (int i = 0; i < symbols.length; ++i) {
+			HashMap<Integer, SPPFNode> H = new HashMap<>();
+			StateSet R = new StateSet(state[i]); // worklist
+			StateSet Q = Q_next;
+			Q_next = new StateSet();
+
+			while (!R.isEmpty()) {
+				// for hash sets this is not deterministic, this may be a problem...
+				EarleyItem Lambda = R.pickOne();
+				if (!Lambda.isComplete() && !isTerminal(Lambda.afterDot())) { // 1
+					for (EarleyRule r : rules.get(Lambda.afterDot())) { // 1.1
+						EarleyItem C = new EarleyItem(r, i);
+						if (r.startsWithNonTerminal()) { // 1.1.1
+							if (state[i].add(C)) {
+								R.add(C);
+							}
+						}
+						if (r.body[0] == symbols[i]) { // 1.1.2
+							assert !r.startsWithNonTerminal();
+							Q.add(C);
+						}
+					}
+
+					SPPFNode v = H.get(Lambda.afterDot()); // TODO: check that we never insert null
+					if (v != null) { // 1.2
+						EarleyItem LambdaNext = Lambda.advance();
+						SPPFNode y = makeNode(LambdaNext.getDottedRule(), LambdaNext.start, i, Lambda.getSPPF(), v, V);
+						LambdaNext.setSPPF(y);
+						if (LambdaNext.isComplete() || !isTerminal(LambdaNext.afterDot())) { // 1.2.1
+							if (state[i].add(LambdaNext)) { // 1.2.1
+								R.add(LambdaNext);
+							}
+						} else if (LambdaNext.afterDot() == symbols[i + 1]) { // 1.2.2
+							Q.add(LambdaNext);
+						}
+					}
+				}
+
+				if (Lambda.isComplete()) { // 2
+					if (Lambda.getSPPF() == null) { // 2.1
+						NodeLabel vLabel = new SymbolLabel(Lambda.rule.head, i, i);
+						SPPFNode v;
+						if (V.containsKey(vLabel)) { // 2.1.1
+							v = V.get(vLabel);
+						} else {
+							v = new SPPFNode(vLabel);
+							V.put(vLabel, v);
+						}
+						Lambda.setSPPF(v);
+						// TODO: if w does not have family (eps) add one? 2.1.2
+					}
+					if (Lambda.start == i) { // 2.2
+						H.put(Lambda.rule.head, Lambda.getSPPF());
+					}
+
+					for (EarleyItem item : state[Lambda.start]) { // 2.3
+						EarleyItem itemNext = item.advance();
+						SPPFNode y = makeNode(itemNext.getDottedRule(), itemNext.start, i, item.getSPPF(), Lambda.getSPPF(), V);
+						EarleyItem newItem = new EarleyItem(itemNext.rule, itemNext.start);
+						newItem.setSPPF(y);
+						if (itemNext.isComplete() || !isTerminal(itemNext.afterDot())) { // 2.3.1
+							if (state[i].add(newItem)) { // 2.3.1
+								R.add(newItem);
+							}
+						} else if (itemNext.afterDot() == symbols[i + 1]) { // 2.3.2
+							Q.add(newItem);
+						}
+					}
+				}
+			}
+
+			V.clear();
+
+			SPPFNode v = new SPPFNode(new SymbolLabel(symbols[i + 1], i, i + 1));
+			while (!Q.isEmpty()) { // 3
+				EarleyItem Lambda = Q.pickOne();
+				assert Lambda.afterDot() == symbols[i + 1];
+				EarleyItem LambdaNext = Lambda.advance();
+				SPPFNode y = makeNode(LambdaNext.getDottedRule(), LambdaNext.start, i + 1, Lambda.getSPPF(), v, V);
+				EarleyItem newItem = new EarleyItem(LambdaNext.rule, LambdaNext.start);
+				newItem.setSPPF(y);
+				if (LambdaNext.isComplete() || !isTerminal(LambdaNext.afterDot())) { // 3.1
+					state[i + 1].add(newItem);
+				} else if (i + 2 < symbols.length && LambdaNext.afterDot() == symbols[i + 2]) { // 3.2
+					Q_next.add(newItem);
+				}
+			}
+		}
+
+		StateSet finalState = state[symbols.length];
+		for (EarleyItem item : finalState) {
+			if (item.isComplete() && item.start == 0 && item.rule.head == startSymbol) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private SPPFNode makeNode(DottedRule dottedRule, int start, int i, SPPFNode sppf, SPPFNode sppf2,
+			HashMap<NodeLabel, SPPFNode> v) {
+		return null;
+	}
+
+
 }

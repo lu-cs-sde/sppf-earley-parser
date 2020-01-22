@@ -7,6 +7,14 @@ public class EarleyRule implements Comparable<EarleyRule> {
 		this.body = body;
 	}
 
+	public boolean isEmpty() {
+		return body.length == 0;
+	}
+
+	public boolean startsWithNonTerminal() {
+		return isEmpty() || !EarleyParser.isTerminal(body[0]);
+	}
+
 	@Override
 	public int compareTo(EarleyRule other) {
 		for (int i = 0; i < Math.min(this.body.length, other.body.length); ++i) {
