@@ -165,67 +165,18 @@ public class EarleyParser {
 				}
 			}
 		}
-
 		return state;
 	}
 
 
 	public boolean recognize(Category s[], Category startSymbol) {
-		StateSet[] state = new StateSet[s.length + 2];
-		int start = cat2int.get(startSymbol);
 		int[] symbols = new int[s.length + 1];
 		for (int i = 0; i < s.length; ++i)
 			symbols[i] = cat2int.get(s[i]);
 		symbols[s.length] = 0;
-		state[0] = new StateSet();
-		for (EarleyRule r : rules.get(start)) {
-			state[0].add(new EarleyItem(r, 0));
-		}
+		int start = cat2int.get(startSymbol);
 
-		for (int i = 0; i < s.length + 1; ++i) {
-			StateSet currentSet = state[i];
-			state[i + 1] = new StateSet();
-			StateSet nextSet = state[i + 1];
-
-			LinkedList<EarleyItem> worklist = new LinkedList<>(currentSet);
-
-			while (!worklist.isEmpty()) {
-				EarleyItem item = worklist.removeFirst();
-				if (item.isComplete()) {
-					// COMPLETION
-					// TODO: we're iterating over items in a parent set here. This is O(n_items).
-					// We can improve this by storing the set as a tree set, which would give
-					// a complexity of O(log(n_items)) for this iteration and also for insertion.
-					for (EarleyItem jtem : state[item.start]) {
-						if (!jtem.isComplete() && jtem.afterDot() == item.rule.head) {
-							EarleyItem newItem = jtem.advance();
-							if (currentSet.add(newItem)) {
-								worklist.addLast(newItem);
-							}
-						}
-					}
-				} else if (isTerminal(item.afterDot())) {
-					// SCAN
-					if (item.afterDot() == symbols[i]) {
-						// we have a match, advance
-						EarleyItem newItem = item.advance();
-						nextSet.add(newItem);
-					} else {
-						// do nothing
-					}
-				} else {
-					// PREDICTION:
-					// non-terminal after dot
-					for (EarleyRule r : rules.get(item.afterDot())) {
-						EarleyItem newItem = new EarleyItem(r, i);
-						if (currentSet.add(newItem)) {
-							// the item was not existing in the set, add it to the worklist
-							worklist.addLast(newItem);
-						}
-					}
-				}
-			}
-		}
+		StateSet[] state = internalParse(symbols, start);
 
 		if (DEBUG) {
 			for (int i = 0; i < s.length + 1; ++i) {
@@ -248,4 +199,16 @@ public class EarleyParser {
 		return false;
 	}
 
+	public void parse(Category s[], Category startSymbol) {
+		int[] symbols = new int[s.length + 1];
+		for (int i = 0; i < s.length; ++i)
+			symbols[i] = cat2int.get(s[i]);
+		symbols[s.length] = 0;
+		int start = cat2int.get(startSymbol);
+
+		StateSet[] state = internalParse(symbols, start);
+
+
+
+	}
 }
