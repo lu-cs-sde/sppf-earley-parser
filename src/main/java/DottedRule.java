@@ -9,6 +9,7 @@ public class DottedRule {
 	}
 
 	public DottedRule advance() {
+		assert !isComplete();
 		return new DottedRule(r, dot + 1);
 	}
 

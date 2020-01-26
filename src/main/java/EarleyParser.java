@@ -301,17 +301,18 @@ public class EarleyParser {
 					}
 
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
-						EarleyItem itemNext = item.advance();
-						SPPFNode y = makeNode(itemNext.getDottedRule(), itemNext.start, i, item.getSPPF(), Lambda.getSPPF(), V);
-						EarleyItem newItem = new EarleyItem(itemNext.rule, itemNext.start);
-						newItem.setSPPF(y);
-						if (itemNext.isComplete() || !isTerminal(itemNext.afterDot())) { // 2.3.1
-							if (state[i].add(newItem)) { // 2.3.1
-								R.add(newItem);
+						if (!item.isComplete() && item.afterDot() == Lambda.rule.r.head) {
+							EarleyItem itemNext = item.advance();
+							SPPFNode y = makeNode(itemNext.getDottedRule(), itemNext.start, i, item.getSPPF(), Lambda.getSPPF(), V);
+							// EarleyItem newItem = new EarleyItem(itemNext.rule, itemNext.start);
+							itemNext.setSPPF(y);
+							if (itemNext.isComplete() || !isTerminal(itemNext.afterDot())) { // 2.3.1
+								if (state[i].add(itemNext)) { // 2.3.1
+									R.add(itemNext);
+								}
+							} else if (itemNext.afterDot() == symbols[i]) { // 2.3.2
+								Q.add(itemNext);
 							}
-						} else if (itemNext.afterDot() == symbols[i]) { // 2.3.2
-							assert itemNext.afterDot() == newItem.afterDot();
-							Q.add(newItem);
 						}
 					}
 				}
@@ -325,12 +326,12 @@ public class EarleyParser {
 				assert Lambda.afterDot() == symbols[i];
 				EarleyItem LambdaNext = Lambda.advance();
 				SPPFNode y = makeNode(LambdaNext.getDottedRule(), LambdaNext.start, i + 1, Lambda.getSPPF(), v, V);
-				EarleyItem newItem = new EarleyItem(LambdaNext.rule, LambdaNext.start);
-				newItem.setSPPF(y);
+				// EarleyItem newItem = new EarleyItem(LambdaNext.rule, LambdaNext.start);
+				LambdaNext.setSPPF(y);
 				if (LambdaNext.isComplete() || !isTerminal(LambdaNext.afterDot())) { // 3.1
-					state[i + 1].add(newItem);
+					state[i + 1].add(LambdaNext);
 				} else if (LambdaNext.afterDot() == symbols[i + 1]) { // 3.2
-					Q_next.add(newItem);
+					Q_next.add(LambdaNext);
 				}
 			}
 		}
