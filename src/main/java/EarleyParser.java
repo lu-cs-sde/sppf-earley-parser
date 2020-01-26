@@ -1,3 +1,4 @@
+import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -80,16 +81,16 @@ public class EarleyParser {
 	}
 
 	private String asString(EarleyItem item) {
-		String s = int2cat.get(item.rule.head).toString() + " -> ";
-		for (int j = 0; j < item.rule.body.length; ++j) {
-			if (j == item.dot) {
+		String s = int2cat.get(item.rule.r.head).toString() + " -> ";
+		for (int j = 0; j < item.rule.r.body.length; ++j) {
+			if (j == item.rule.dot) {
 				s += "\u2022 ";
 			}
-			int symbol = item.rule.body[j];
+			int symbol = item.rule.r.body[j];
 			s += int2cat.get(symbol).toString() + " ";
 		}
 
-		if (item.dot == item.rule.body.length) {
+		if (item.rule.dot == item.rule.r.body.length) {
 			s += "\u2022";
 		}
 
@@ -156,7 +157,7 @@ public class EarleyParser {
 					// We can improve this by storing the set as a tree set, which would give
 					// a complexity of O(log(n_items)) for this iteration and also for insertion.
 					for (EarleyItem jtem : state[item.start]) {
-						if (!jtem.isComplete() && jtem.afterDot() == item.rule.head) {
+						if (!jtem.isComplete() && jtem.afterDot() == item.rule.r.head) {
 							EarleyItem newItem = jtem.advance();
 							if (currentSet.add(newItem)) {
 								worklist.addLast(newItem);
@@ -196,7 +197,7 @@ public class EarleyParser {
 		symbols[s.length] = 0;
 		int start = cat2int.get(startSymbol);
 
-		StateSet[] state = internalParse(symbols, start);
+		StateSet[] state = internalParseScott(symbols, start);
 
 		if (DEBUG) {
 			for (int i = 0; i < s.length + 1; ++i) {
@@ -211,7 +212,7 @@ public class EarleyParser {
 		StateSet finalState = state[s.length];
 		System.out.println("===========================");
 		for (EarleyItem item : finalState) {
-			if (item.isComplete() && item.start == 0 && item.rule.head == start) {
+			if (item.isComplete() && item.start == 0 && item.rule.r.head == start) {
 				return true;
 			}
 		}
@@ -229,9 +230,10 @@ public class EarleyParser {
 		StateSet[] state = internalParse(symbols, start);
 	}
 
-	private boolean internalParseScott(int[] symbols, int startSymbol) {
+	private StateSet[] internalParseScott(int[] symbols, int startSymbol) {
 		StateSet[] state = new StateSet[symbols.length + 1];
-		state[0] = new StateSet();
+		for (int i = 0; i < state.length; ++i)
+			state[i] = new StateSet();
 
 		StateSet Q_next = new StateSet();
 		HashMap<NodeLabel, SPPFNode> V = new HashMap<>();
@@ -275,7 +277,7 @@ public class EarleyParser {
 							if (state[i].add(LambdaNext)) { // 1.2.1
 								R.add(LambdaNext);
 							}
-						} else if (LambdaNext.afterDot() == symbols[i + 1]) { // 1.2.2
+						} else if (LambdaNext.afterDot() == symbols[i]) { // 1.2.2
 							Q.add(LambdaNext);
 						}
 					}
@@ -283,7 +285,7 @@ public class EarleyParser {
 
 				if (Lambda.isComplete()) { // 2
 					if (Lambda.getSPPF() == null) { // 2.1
-						NodeLabel vLabel = new SymbolLabel(Lambda.rule.head, i, i);
+						NodeLabel vLabel = new SymbolLabel(Lambda.rule.r.head, i, i);
 						SPPFNode v;
 						if (V.containsKey(vLabel)) { // 2.1.1
 							v = V.get(vLabel);
@@ -295,7 +297,7 @@ public class EarleyParser {
 						// TODO: if w does not have family (eps) add one? 2.1.2
 					}
 					if (Lambda.start == i) { // 2.2
-						H.put(Lambda.rule.head, Lambda.getSPPF());
+						H.put(Lambda.rule.r.head, Lambda.getSPPF());
 					}
 
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
@@ -307,7 +309,8 @@ public class EarleyParser {
 							if (state[i].add(newItem)) { // 2.3.1
 								R.add(newItem);
 							}
-						} else if (itemNext.afterDot() == symbols[i + 1]) { // 2.3.2
+						} else if (itemNext.afterDot() == symbols[i]) { // 2.3.2
+							assert itemNext.afterDot() == newItem.afterDot();
 							Q.add(newItem);
 						}
 					}
@@ -316,30 +319,23 @@ public class EarleyParser {
 
 			V.clear();
 
-			SPPFNode v = new SPPFNode(new SymbolLabel(symbols[i + 1], i, i + 1));
+			SPPFNode v = new SPPFNode(new SymbolLabel(symbols[i], i, i + 1));
 			while (!Q.isEmpty()) { // 3
 				EarleyItem Lambda = Q.pickOne();
-				assert Lambda.afterDot() == symbols[i + 1];
+				assert Lambda.afterDot() == symbols[i];
 				EarleyItem LambdaNext = Lambda.advance();
 				SPPFNode y = makeNode(LambdaNext.getDottedRule(), LambdaNext.start, i + 1, Lambda.getSPPF(), v, V);
 				EarleyItem newItem = new EarleyItem(LambdaNext.rule, LambdaNext.start);
 				newItem.setSPPF(y);
 				if (LambdaNext.isComplete() || !isTerminal(LambdaNext.afterDot())) { // 3.1
 					state[i + 1].add(newItem);
-				} else if (i + 2 < symbols.length && LambdaNext.afterDot() == symbols[i + 2]) { // 3.2
+				} else if (LambdaNext.afterDot() == symbols[i + 1]) { // 3.2
 					Q_next.add(newItem);
 				}
 			}
 		}
 
-		StateSet finalState = state[symbols.length];
-		for (EarleyItem item : finalState) {
-			if (item.isComplete() && item.start == 0 && item.rule.head == startSymbol) {
-				return true;
-			}
-		}
-
-		return false;
+		return state;
 	}
 
 	private SPPFNode makeNode(DottedRule dottedRule, int start, int i, SPPFNode sppf, SPPFNode sppf2,

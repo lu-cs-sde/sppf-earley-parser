@@ -1,11 +1,24 @@
 public class DottedRule {
-	EarleyRule r;
-	int dot;
+	final EarleyRule r;
+	final int dot;
 
 	public DottedRule(EarleyRule r, int dot) {
 		assert r != null;
 		this.r = r;
 		this.dot = dot;
+	}
+
+	public DottedRule advance() {
+		return new DottedRule(r, dot + 1);
+	}
+
+	public boolean isComplete() {
+		return r.body.length == dot;
+	}
+
+	public int afterDot() {
+		assert !isComplete();
+		return r.body[dot];
 	}
 
 	@Override
