@@ -1,4 +1,8 @@
 import javax.swing.plaf.nimbus.State;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -181,7 +185,7 @@ public class EarleyParser implements PrettyPrintingInfo {
 			for (int i = 0; i < s.length + 1; ++i) {
 				System.out.println("=== Item set at position " + i + " ===");
 				for (EarleyItem item : state[i]) {
-					if (item.isComplete())
+					if (true || item.isComplete())
 						System.out.println(item.prettyPrint(this));
 				}
 			}
@@ -189,13 +193,26 @@ public class EarleyParser implements PrettyPrintingInfo {
 
 		StateSet finalState = state[s.length];
 		System.out.println("===========================");
+		boolean recognized = false;
+		int count = 0;
+
 		for (EarleyItem item : finalState) {
 			if (item.isComplete() && item.start == 0 && item.rule.r.head == start) {
-				return true;
+				try {
+					PrintStream out = new PrintStream(new File("sppf_" + count++ + ".dot"));
+					DotVisitor visitor = new DotVisitor(out, this);
+					visitor.prologue();
+					item.getSPPF().accept(visitor);
+					visitor.epilogue();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				recognized = true;
 			}
 		}
 
-		return false;
+		return recognized;
 	}
 
 	public void parse(Category s[], Category startSymbol) {
@@ -217,7 +234,8 @@ public class EarleyParser implements PrettyPrintingInfo {
 		HashMap<NodeLabel, SPPFNode> V = new HashMap<>();
 
 		for (EarleyRule r : rules.get(startSymbol)) {
-			state[0].add(new EarleyItem(r, 0));
+			if (r.startsWithNonTerminal())
+				state[0].add(new EarleyItem(r, 0));
 			if (!r.isEmpty() && r.body[0] == symbols[0]) {
 				Q_next.add(new EarleyItem(r, 0));
 			}
@@ -239,8 +257,7 @@ public class EarleyParser implements PrettyPrintingInfo {
 							if (state[i].add(C)) {
 								R.add(C);
 							}
-						}
-						if (r.body[0] == symbols[i]) { // 1.1.2
+						} else if (r.body[0] == symbols[i]) { // 1.1.2
 							assert !r.startsWithNonTerminal();
 							Q.add(C);
 						}
@@ -278,21 +295,25 @@ public class EarleyParser implements PrettyPrintingInfo {
 						H.put(Lambda.rule.r.head, Lambda.getSPPF());
 					}
 
+					HashSet<EarleyItem> RTemp = new HashSet<>(); // this is needed to avoid concurrent modification which occurs when Lambda.start == i
+
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
 						if (!item.isComplete() && item.afterDot() == Lambda.rule.r.head) {
 							EarleyItem itemNext = item.advance();
 							SPPFNode y = makeNode(itemNext.getDottedRule(), itemNext.start, i, item.getSPPF(), Lambda.getSPPF(), V);
-							// EarleyItem newItem = new EarleyItem(itemNext.rule, itemNext.start);
 							itemNext.setSPPF(y);
 							if (itemNext.isComplete() || !isTerminal(itemNext.afterDot())) { // 2.3.1
-								if (state[i].add(itemNext)) { // 2.3.1
-									R.add(itemNext);
+								// assert i != Lambda.start;
+								if (!state[i].contains(itemNext)) { // 2.3.1
+									RTemp.add(itemNext);
 								}
 							} else if (itemNext.afterDot() == symbols[i]) { // 2.3.2
 								Q.add(itemNext);
 							}
 						}
 					}
+					R.addAll(RTemp);
+					state[i].addAll(RTemp);
 				}
 			}
 

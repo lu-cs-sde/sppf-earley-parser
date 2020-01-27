@@ -7,7 +7,7 @@ public class Rule {
 
 	public Rule(Category head, Category...  body) {
 		this.head = head;
-		assert body.length > 0;
+		// assert body.length > 0;
 		this.body = body;
 	}
 

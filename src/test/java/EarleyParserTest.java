@@ -90,4 +90,50 @@ public class EarleyParserTest {
 		EarleyParser parser = makeAmbiguousParser();
 		assertTrue(parser.recognize(str, s));
 	}
+
+	@Test public void testScottExample2() {
+		EarleyParser parser = new EarleyParser();
+
+		Category S = new Category("S", false);
+		Category b = new Category("b", true);
+
+		parser.addCategory(S);
+		parser.addCategory(b);
+		parser.addRule(new Rule(S, S, S));
+		parser.addRule(new Rule(S, b));
+
+		parser.done();
+
+		Category str [] = {b, b, b};
+		assertTrue(parser.recognize(str, S));
+	}
+
+	@Test public void testScottExample3() {
+		EarleyParser parser = new EarleyParser();
+		Category S = new Category("S", false);
+		Category A = new Category("A", false);
+		Category B = new Category("B", false);
+		Category T = new Category("T", false);
+		Category a = new Category("a", true);
+		Category b = new Category("b", true);
+
+		parser.addCategory(S);
+		parser.addCategory(A);
+		parser.addCategory(B);
+		parser.addCategory(T);
+		parser.addCategory(a);
+		parser.addCategory(b);
+
+		parser.addRule(new Rule(S, A, T));
+		parser.addRule(new Rule(S, a, T));
+		parser.addRule(new Rule(A, a));
+		parser.addRule(new Rule(A, B, A));
+		parser.addRule(new Rule(B)); // epsilon production
+		parser.addRule(new Rule(T, b, b, b));
+
+		parser.done();
+
+		Category str[] = {a, b, b, b};
+		assertTrue(parser.recognize(str, S));
+	}
 }
