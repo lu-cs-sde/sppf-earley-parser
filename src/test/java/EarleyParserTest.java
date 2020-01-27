@@ -17,25 +17,24 @@ public class EarleyParserTest {
 
 	EarleyParser makeParser() {
 
-		EarleyParser parser = new EarleyParser();
-		parser.addCategory(num);
-		parser.addCategory(var);
-		parser.addCategory(plus);
-		parser.addCategory(times);
-		parser.addCategory(s);
-		parser.addCategory(p);
-		parser.addCategory(t);
+		Grammar g = new Grammar();
 
-		parser.addRule(new Rule(s, s, plus, p));
-		parser.addRule(new Rule(s, p));
-		parser.addRule(new Rule(p, p, times, t));
-		parser.addRule(new Rule(p, t));
-		parser.addRule(new Rule(t, num));
-		parser.addRule(new Rule(t, var));
+		g.addCategory(num);
+		g.addCategory(var);
+		g.addCategory(plus);
+		g.addCategory(times);
+		g.addCategory(s);
+		g.addCategory(p);
+		g.addCategory(t);
 
-		parser.done();
+		g.addRule(new Rule(s, s, plus, p));
+		g.addRule(new Rule(s, p));
+		g.addRule(new Rule(p, p, times, t));
+		g.addRule(new Rule(p, t));
+		g.addRule(new Rule(t, num));
+		g.addRule(new Rule(t, var));
 
-		return parser;
+		return new EarleyParser(g);
 	}
 
 	@Test public void testToString() {
@@ -60,29 +59,27 @@ public class EarleyParserTest {
 
 
 	EarleyParser makeAmbiguousParser() {
-		EarleyParser parser = new EarleyParser();
-		parser.addCategory(num);
-		parser.addCategory(var);
-		parser.addCategory(plus);
-		parser.addCategory(times);
-		parser.addCategory(metaVar);
-		parser.addCategory(s);
-		parser.addCategory(p);
-		parser.addCategory(t);
+		Grammar g = new Grammar();
+		g.addCategory(num);
+		g.addCategory(var);
+		g.addCategory(plus);
+		g.addCategory(times);
+		g.addCategory(metaVar);
+		g.addCategory(s);
+		g.addCategory(p);
+		g.addCategory(t);
 
-		parser.addRule(new Rule(s, s, plus, p));
-		parser.addRule(new Rule(s, p));
-		parser.addRule(new Rule(p, p, times, t));
-		parser.addRule(new Rule(p, t));
-		parser.addRule(new Rule(t, num));
-		parser.addRule(new Rule(t, var));
-		parser.addRule(new Rule(t, metaVar));
-		parser.addRule(new Rule(p, metaVar));
-		parser.addRule(new Rule(s, metaVar));
+		g.addRule(new Rule(s, s, plus, p));
+		g.addRule(new Rule(s, p));
+		g.addRule(new Rule(p, p, times, t));
+		g.addRule(new Rule(p, t));
+		g.addRule(new Rule(t, num));
+		g.addRule(new Rule(t, var));
+		g.addRule(new Rule(t, metaVar));
+		g.addRule(new Rule(p, metaVar));
+		g.addRule(new Rule(s, metaVar));
 
-		parser.done();
-
-		return parser;
+		return new EarleyParser(g);
 	}
 
 	@Test public void testParse3() {
@@ -92,24 +89,25 @@ public class EarleyParserTest {
 	}
 
 	@Test public void testScottExample2() {
-		EarleyParser parser = new EarleyParser();
+
 
 		Category S = new Category("S", false);
 		Category b = new Category("b", true);
 
-		parser.addCategory(S);
-		parser.addCategory(b);
-		parser.addRule(new Rule(S, S, S));
-		parser.addRule(new Rule(S, b));
+		Grammar g = new Grammar();
 
-		parser.done();
+		g.addCategory(S);
+		g.addCategory(b);
+		g.addRule(new Rule(S, S, S));
+		g.addRule(new Rule(S, b));
+
+		EarleyParser parser = new EarleyParser(g);
 
 		Category str [] = {b, b, b};
 		assertTrue(parser.recognize(str, S));
 	}
 
 	@Test public void testScottExample3() {
-		EarleyParser parser = new EarleyParser();
 		Category S = new Category("S", false);
 		Category A = new Category("A", false);
 		Category B = new Category("B", false);
@@ -117,23 +115,47 @@ public class EarleyParserTest {
 		Category a = new Category("a", true);
 		Category b = new Category("b", true);
 
-		parser.addCategory(S);
-		parser.addCategory(A);
-		parser.addCategory(B);
-		parser.addCategory(T);
-		parser.addCategory(a);
-		parser.addCategory(b);
+		Grammar g = new Grammar();
 
-		parser.addRule(new Rule(S, A, T));
-		parser.addRule(new Rule(S, a, T));
-		parser.addRule(new Rule(A, a));
-		parser.addRule(new Rule(A, B, A));
-		parser.addRule(new Rule(B)); // epsilon production
-		parser.addRule(new Rule(T, b, b, b));
+		g.addCategory(S);
+		g.addCategory(A);
+		g.addCategory(B);
+		g.addCategory(T);
+		g.addCategory(a);
+		g.addCategory(b);
 
-		parser.done();
+		g.addRule(new Rule(S, A, T));
+		g.addRule(new Rule(S, a, T));
+		g.addRule(new Rule(A, a));
+		g.addRule(new Rule(A, B, A));
+		g.addRule(new Rule(B)); // epsilon production
+		g.addRule(new Rule(T, b, b, b));
+
+		EarleyParser parser = new EarleyParser(g);
 
 		Category str[] = {a, b, b, b};
 		assertTrue(parser.recognize(str, S));
+	}
+
+	@Test public void testJava1() {
+		Grammar g = new Grammar();
+		Java14Grammar.addRules(g);
+
+		EarleyParser parser = new EarleyParser(g);
+
+		Category str[] = {Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_EQ,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_SEMICOLON};
+
+		assertTrue(parser.recognize(str, Java14Grammar.n_statement));
 	}
 }

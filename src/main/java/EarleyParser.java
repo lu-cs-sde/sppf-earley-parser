@@ -12,85 +12,23 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class EarleyParser implements PrettyPrintingInfo {
+public class EarleyParser {
 	private boolean DEBUG = true;
 
-	private HashMap<Category, Integer> cat2int;
-	private HashMap<Integer, Category> int2cat;
-
-	private int nonTermIndex = 1;
-	private int termIndex = -1;
-
 	private ArrayList<TreeSet<EarleyRule>> rules;
+	private Grammar grammar;
 
-	private HashMap<Category, ArrayList<Rule>> grammarRules;
-
-
-	public EarleyParser() {
-		cat2int = new HashMap<>();
-		int2cat = new HashMap<>();
-		grammarRules = new HashMap<>();
-	}
-
-	@Override public Category getCategory(int i) {
-		return int2cat.get(i);
-	}
-
-	// Interface to the higher level gramar
-	public void addCategory(Category t) {
-		if (t.isTerminal()) {
-			cat2int.put(t, termIndex);
-			int2cat.put(termIndex, t);
-			termIndex--;
-		} else {
-			cat2int.put(t, nonTermIndex);
-			int2cat.put(nonTermIndex, t);
-			nonTermIndex++;
-		}
+	public EarleyParser(Grammar g) {
+		this.grammar = g;
+		rules = g.getInternalRules();
 	}
 
 	static boolean isTerminal(int cat) {
 		return cat < 0;
 	}
 
-	public void addRule(Rule r) {
-		ArrayList<Rule> list = grammarRules.get(r.getHead());
-		if (list == null) {
-			list = new ArrayList<Rule>();
-			grammarRules.put(r.getHead(), list);
-		}
-		list.add(r);
-	}
-
-	public void done() {
-		rules = new ArrayList<>(grammarRules.size() + 1);
-		rules.add(new TreeSet<EarleyRule>());
-		for (int i = 1; i < grammarRules.size() + 1; ++i) {
-			Category head = int2cat.get(i);
-			ArrayList<Rule> bodies = grammarRules.get(head);
-			TreeSet<EarleyRule> eBodies = new TreeSet<>();
-			for (Rule b : bodies) {
-				int[] body = new int[b.getBody().size()];
-				for (int j = 0; j < body.length; ++j) {
-					body[j] = cat2int.get(b.getBody().get(j));
-				}
-				eBodies.add(new EarleyRule(i, body));
-			}
-			rules.add(eBodies);
-		}
-	}
-
 	public String toString() {
-		String s = "";
-		for (int i = 1; i < rules.size(); ++i) {
-			TreeSet<EarleyRule> rs = rules.get(i);
-			for (EarleyRule r : rs) {
-				assert r.head == i;
-				s += r.prettyPrint(this);
-				s += "\n";
-			}
-		}
-		return s;
+		return grammar.toString();
 	}
 
 	class StateSet extends HashSet<EarleyItem> {
@@ -114,70 +52,12 @@ public class EarleyParser implements PrettyPrintingInfo {
 		}
 	}
 
-	/**
-	   @param symbols - a zero terminated array of symbols
-	 */
-	private StateSet[] internalParse(int[] symbols, int startSymbol) {
-		StateSet[] state = new StateSet[symbols.length + 1];
-		state[0] = new StateSet();
-		for (EarleyRule r : rules.get(startSymbol)) {
-			state[0].add(new EarleyItem(r, 0));
-		}
-
-		for (int i = 0; i < symbols.length; ++i) {
-			StateSet currentSet = state[i];
-			state[i + 1] = new StateSet();
-			StateSet nextSet = state[i + 1];
-
-			LinkedList<EarleyItem> worklist = new LinkedList<>(currentSet);
-
-			while (!worklist.isEmpty()) {
-				EarleyItem item = worklist.removeFirst();
-				if (item.isComplete()) {
-					// COMPLETION
-					// TODO: we're iterating over items in a parent set here. This is O(n_items).
-					// We can improve this by storing the set as a tree set, which would give
-					// a complexity of O(log(n_items)) for this iteration and also for insertion.
-					for (EarleyItem jtem : state[item.start]) {
-						if (!jtem.isComplete() && jtem.afterDot() == item.rule.r.head) {
-							EarleyItem newItem = jtem.advance();
-							if (currentSet.add(newItem)) {
-								worklist.addLast(newItem);
-							}
-						}
-					}
-				} else if (isTerminal(item.afterDot())) {
-					// SCAN
-					if (item.afterDot() == symbols[i]) {
-						// we have a match, advance
-						EarleyItem newItem = item.advance();
-						nextSet.add(newItem);
-					} else {
-						// do nothing
-					}
-				} else {
-					// PREDICTION:
-					// non-terminal after dot
-					for (EarleyRule r : rules.get(item.afterDot())) {
-						EarleyItem newItem = new EarleyItem(r, i);
-						if (currentSet.add(newItem)) {
-							// the item was not existing in the set, add it to the worklist
-							worklist.addLast(newItem);
-						}
-					}
-				}
-			}
-		}
-		return state;
-	}
-
-
 	public boolean recognize(Category s[], Category startSymbol) {
 		int[] symbols = new int[s.length + 1];
 		for (int i = 0; i < s.length; ++i)
-			symbols[i] = cat2int.get(s[i]);
+			symbols[i] = grammar.getInternalSymbol(s[i]);
 		symbols[s.length] = 0;
-		int start = cat2int.get(startSymbol);
+		int start = grammar.getInternalSymbol(startSymbol);
 
 		StateSet[] state = internalParseScott(symbols, start);
 
@@ -186,7 +66,7 @@ public class EarleyParser implements PrettyPrintingInfo {
 				System.out.println("=== Item set at position " + i + " ===");
 				for (EarleyItem item : state[i]) {
 					if (true || item.isComplete())
-						System.out.println(item.prettyPrint(this));
+						System.out.println(item.prettyPrint(grammar));
 				}
 			}
 		}
@@ -200,7 +80,7 @@ public class EarleyParser implements PrettyPrintingInfo {
 			if (item.isComplete() && item.start == 0 && item.rule.r.head == start) {
 				try {
 					PrintStream out = new PrintStream(new File("sppf_" + count++ + ".dot"));
-					DotVisitor visitor = new DotVisitor(out, this);
+					DotVisitor visitor = new DotVisitor(out, grammar);
 					visitor.prologue();
 					item.getSPPF().accept(visitor);
 					visitor.epilogue();
@@ -215,16 +95,28 @@ public class EarleyParser implements PrettyPrintingInfo {
 		return recognized;
 	}
 
-	public void parse(Category s[], Category startSymbol) {
+	public SPPFNode parse(Category s[], Category startSymbol) {
 		int[] symbols = new int[s.length + 1];
 		for (int i = 0; i < s.length; ++i)
-			symbols[i] = cat2int.get(s[i]);
+			symbols[i] = grammar.getInternalSymbol(s[i]);
 		symbols[s.length] = 0;
-		int start = cat2int.get(startSymbol);
+		int start = grammar.getInternalSymbol(startSymbol);
 
-		StateSet[] state = internalParse(symbols, start);
+		StateSet[] state = internalParseScott(symbols, start);
+		StateSet finalState = state[s.length];
+
+		for (EarleyItem item : finalState) {
+			if (item.isComplete() && item.start == 0 && item.rule.r.head == start) {
+				return item.getSPPF();
+			}
+		}
+
+		return null;
 	}
 
+	/**
+	   symbols - a zero terminated array of symbols
+	*/
 	private StateSet[] internalParseScott(int[] symbols, int startSymbol) {
 		StateSet[] state = new StateSet[symbols.length + 1];
 		for (int i = 0; i < state.length; ++i)
@@ -295,8 +187,8 @@ public class EarleyParser implements PrettyPrintingInfo {
 						H.put(Lambda.rule.r.head, Lambda.getSPPF());
 					}
 
-					HashSet<EarleyItem> RTemp = new HashSet<>(); // this is needed to avoid concurrent modification which occurs when Lambda.start == i
-
+					// this is needed to avoid concurrent modification which occurs when Lambda.start == i
+					HashSet<EarleyItem> RTemp = new HashSet<>();
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
 						if (!item.isComplete() && item.afterDot() == Lambda.rule.r.head) {
 							EarleyItem itemNext = item.advance();
