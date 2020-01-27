@@ -19,14 +19,6 @@ public class EarleyParserTest {
 
 		Grammar g = new Grammar();
 
-		g.addCategory(num);
-		g.addCategory(var);
-		g.addCategory(plus);
-		g.addCategory(times);
-		g.addCategory(s);
-		g.addCategory(p);
-		g.addCategory(t);
-
 		g.addRule(new Rule(s, s, plus, p));
 		g.addRule(new Rule(s, p));
 		g.addRule(new Rule(p, p, times, t));
@@ -60,14 +52,6 @@ public class EarleyParserTest {
 
 	EarleyParser makeAmbiguousParser() {
 		Grammar g = new Grammar();
-		g.addCategory(num);
-		g.addCategory(var);
-		g.addCategory(plus);
-		g.addCategory(times);
-		g.addCategory(metaVar);
-		g.addCategory(s);
-		g.addCategory(p);
-		g.addCategory(t);
 
 		g.addRule(new Rule(s, s, plus, p));
 		g.addRule(new Rule(s, p));
@@ -96,8 +80,6 @@ public class EarleyParserTest {
 
 		Grammar g = new Grammar();
 
-		g.addCategory(S);
-		g.addCategory(b);
 		g.addRule(new Rule(S, S, S));
 		g.addRule(new Rule(S, b));
 
@@ -116,13 +98,6 @@ public class EarleyParserTest {
 		Category b = new Category("b", true);
 
 		Grammar g = new Grammar();
-
-		g.addCategory(S);
-		g.addCategory(A);
-		g.addCategory(B);
-		g.addCategory(T);
-		g.addCategory(a);
-		g.addCategory(b);
 
 		g.addRule(new Rule(S, A, T));
 		g.addRule(new Rule(S, a, T));
@@ -145,6 +120,10 @@ public class EarleyParserTest {
 
 		Category str[] = {Java14Grammar.t_METAVARID,
 						  Java14Grammar.t_EQ,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
 						  Java14Grammar.t_METAVARID,
 						  Java14Grammar.t_PLUS,
 						  Java14Grammar.t_METAVARID,
