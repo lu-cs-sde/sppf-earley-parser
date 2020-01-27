@@ -1,0 +1,8 @@
+#+TITLE: SEP: a faster Earley parser
+
+This in an implementation of Earley's parsing algorithm as described in Elizabeth Scott's paper
+*SPPF-Style Parsing From Earley Recognizers*.
+
+This parser is intended for work with ambigous grammars, where more than one derivation tree
+is expected when parsing a given string. To accomodate this case, the result of the parsing is
+represented a shared packed parse forest (SPPF) instead of a tree.
