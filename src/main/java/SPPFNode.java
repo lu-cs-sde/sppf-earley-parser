@@ -73,18 +73,17 @@ public class SPPFNode {
 		children.add(new FamilyNode(null, null));
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		return label.prettyPrint(info);
 	}
 
 	public void accept(SPPFNodeVisitor visitor) {
 		visitor.visit(this);
 	}
-}
 
-interface SPPFNodeVisitor {
-	public void visit(SPPFNode.FamilyNode familyNode);
-	public void visit(SPPFNode n);
+	public NodeLabel getLabel() {
+		return label;
+	}
 }
 
 class DotVisitor implements SPPFNodeVisitor {
@@ -92,9 +91,9 @@ class DotVisitor implements SPPFNodeVisitor {
 	private int nodeID = 0;
 	private HashMap<SPPFNode, Integer> visitedNodes = new HashMap<>();
 	private HashMap<SPPFNode.FamilyNode, Integer> visitedFamilies = new HashMap<>();
-	private PrettyPrintingInfo info;
+	private Grammar info;
 
-	public DotVisitor(PrintStream ps, PrettyPrintingInfo info) {
+	public DotVisitor(PrintStream ps, Grammar info) {
 		this.info = info;
 		this.ps = ps;
 	}

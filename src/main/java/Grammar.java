@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-public class Grammar implements PrettyPrintingInfo {
+public class Grammar {
 	private HashMap<Category, Integer> cat2int = new HashMap<>();
 	private HashMap<Integer, Category> int2cat = new HashMap<>();
 	private HashMap<Category, ArrayList<Rule>> grammarRules = new HashMap<>();
@@ -82,7 +82,6 @@ public class Grammar implements PrettyPrintingInfo {
 		return s;
 	}
 
-	@Override
 	public Category getCategory(int i) {
 		Category c = int2cat.get(i);
 		if (c == null)

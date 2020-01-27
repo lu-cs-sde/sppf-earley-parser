@@ -50,7 +50,7 @@ public class EarleyItem {
 		return (rule.hashCode() * 31 + start) * 31 + (sppf == null ? 0 : sppf.hashCode());
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		String s = info.getCategory(rule.r.head).toString() + " -> ";
 		for (int j = 0; j < rule.r.body.length; ++j) {
 			if (j == rule.dot) {

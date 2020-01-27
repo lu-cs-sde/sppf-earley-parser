@@ -16,7 +16,7 @@ public abstract class NodeLabel {
 		return 31 * start + end;
 	}
 
-	public abstract String prettyPrint(PrettyPrintingInfo info);
+	public abstract String prettyPrint(Grammar info);
 }
 
 class ItemLabel extends NodeLabel {
@@ -37,7 +37,7 @@ class ItemLabel extends NodeLabel {
 		return super.hashCode() * 31 + item.hashCode();
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		return item.prettyPrint(info) + ", " + super.start + ", " + super.end;
 	}
 }
@@ -60,7 +60,7 @@ class SymbolLabel extends NodeLabel {
 		return super.hashCode() * 31 + symbol;
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		return info.getCategory(symbol).toString() + ", " + super.start + ", " + super.end;
 	}
 }

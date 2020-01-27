@@ -32,7 +32,7 @@ public class EarleyRule implements Comparable<EarleyRule> {
 		}
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		String s = info.getCategory(head).toString() + " -> ";
 		for (int j : body) {
 			s += info.getCategory(j).toString() + " ";

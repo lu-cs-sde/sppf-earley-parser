@@ -47,7 +47,7 @@ public class DottedRule {
 		return true;
 	}
 
-	public String prettyPrint(PrettyPrintingInfo info) {
+	public String prettyPrint(Grammar info) {
 		String s = info.getCategory(r.head).toString() + " -> ";
 		for (int j = 0; j < r.body.length; ++j) {
 			if (j == dot) {
