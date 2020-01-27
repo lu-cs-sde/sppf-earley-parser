@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class EarleyParser {
+public class EarleyParser implements PrettyPrintingInfo {
 	private boolean DEBUG = true;
 
 	private HashMap<Category, Integer> cat2int;
@@ -26,6 +26,10 @@ public class EarleyParser {
 		cat2int = new HashMap<>();
 		int2cat = new HashMap<>();
 		grammarRules = new HashMap<>();
+	}
+
+	@Override public Category getCategory(int i) {
+		return int2cat.get(i);
 	}
 
 	// Interface to the higher level gramar
@@ -72,39 +76,13 @@ public class EarleyParser {
 		}
 	}
 
-	private String asString(EarleyRule rule) {
-		String s = int2cat.get(rule.head).toString() + " -> ";
-		for (int j : rule.body) {
-			s += int2cat.get(j).toString() + " ";
-		}
-		return s;
-	}
-
-	private String asString(EarleyItem item) {
-		String s = int2cat.get(item.rule.r.head).toString() + " -> ";
-		for (int j = 0; j < item.rule.r.body.length; ++j) {
-			if (j == item.rule.dot) {
-				s += "\u2022 ";
-			}
-			int symbol = item.rule.r.body[j];
-			s += int2cat.get(symbol).toString() + " ";
-		}
-
-		if (item.rule.dot == item.rule.r.body.length) {
-			s += "\u2022";
-		}
-
-		s += "(" + item.start + ")";
-		return s;
-	}
-
 	public String toString() {
 		String s = "";
 		for (int i = 1; i < rules.size(); ++i) {
 			TreeSet<EarleyRule> rs = rules.get(i);
 			for (EarleyRule r : rs) {
 				assert r.head == i;
-				s += asString(r);
+				s += r.prettyPrint(this);
 				s += "\n";
 			}
 		}
@@ -204,7 +182,7 @@ public class EarleyParser {
 				System.out.println("=== Item set at position " + i + " ===");
 				for (EarleyItem item : state[i]) {
 					if (item.isComplete())
-						System.out.println(asString(item));
+						System.out.println(item.prettyPrint(this));
 				}
 			}
 		}
@@ -294,7 +272,7 @@ public class EarleyParser {
 							V.put(vLabel, v);
 						}
 						Lambda.setSPPF(v);
-						// TODO: if w does not have family (eps) add one? 2.1.2
+						v.addEpsilon(); // 2.1.2
 					}
 					if (Lambda.start == i) { // 2.2
 						H.put(Lambda.rule.r.head, Lambda.getSPPF());
@@ -339,10 +317,31 @@ public class EarleyParser {
 		return state;
 	}
 
-	private SPPFNode makeNode(DottedRule dottedRule, int start, int i, SPPFNode sppf, SPPFNode sppf2,
-			HashMap<NodeLabel, SPPFNode> v) {
-		return null;
+	private SPPFNode makeNode(DottedRule dottedRule, int j, int i, SPPFNode w, SPPFNode v,
+							  HashMap<NodeLabel, SPPFNode> V) {
+		NodeLabel s;
+		if (dottedRule.isComplete()) {
+			s = new SymbolLabel(dottedRule.r.head, j, i);
+		} else {
+			s = new ItemLabel(dottedRule, j, i);
+		}
+
+		if (!dottedRule.isComplete() && dottedRule.dot == 1) {
+			return v;
+		} else {
+			SPPFNode y = V.get(s);
+			if (y == null) {
+				y = new SPPFNode(s);
+				V.put(s, y);
+			}
+
+			if (w == null) {
+				y.addChild(v);
+			} else {
+				y.addChildren(w, v);
+			}
+
+			return y;
+		}
 	}
-
-
 }

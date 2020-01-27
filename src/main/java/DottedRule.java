@@ -46,4 +46,21 @@ public class DottedRule {
 			return false;
 		return true;
 	}
+
+	public String prettyPrint(PrettyPrintingInfo info) {
+		String s = info.getCategory(r.head).toString() + " -> ";
+		for (int j = 0; j < r.body.length; ++j) {
+			if (j == dot) {
+				s += "\u2022 ";
+			}
+			int symbol = r.body[j];
+			s += info.getCategory(symbol).toString() + " ";
+		}
+
+		if (dot == r.body.length) {
+			s += "\u2022";
+		}
+
+		return s;
+	}
 }

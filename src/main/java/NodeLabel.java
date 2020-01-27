@@ -1,4 +1,4 @@
-public class NodeLabel {
+public abstract class NodeLabel {
 	int start, end;
 	protected NodeLabel(int start, int end) {
 		this.start = start;
@@ -15,6 +15,8 @@ public class NodeLabel {
 	@Override public int hashCode() {
 		return 31 * start + end;
 	}
+
+	public abstract String prettyPrint(PrettyPrintingInfo info);
 }
 
 class ItemLabel extends NodeLabel {
@@ -34,6 +36,10 @@ class ItemLabel extends NodeLabel {
 	@Override public int hashCode() {
 		return super.hashCode() * 31 + item.hashCode();
 	}
+
+	public String prettyPrint(PrettyPrintingInfo info) {
+		return item.prettyPrint(info) + ", " + super.start + ", " + super.end;
+	}
 }
 
 class SymbolLabel extends NodeLabel {
@@ -52,5 +58,9 @@ class SymbolLabel extends NodeLabel {
 
 	@Override public int hashCode() {
 		return super.hashCode() * 31 + symbol;
+	}
+
+	public String prettyPrint(PrettyPrintingInfo info) {
+		return info.getCategory(symbol).toString() + ", " + super.start + ", " + super.end;
 	}
 }
