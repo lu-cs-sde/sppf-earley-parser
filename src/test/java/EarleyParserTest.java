@@ -137,4 +137,26 @@ public class EarleyParserTest {
 
 		assertTrue(parser.recognize(str, Java14Grammar.n_statement));
 	}
+
+	@Test public void testJava2() {
+		Grammar g = new Grammar();
+		Java14Grammar.addRules(g);
+
+		EarleyParser parser = new EarleyParser(g);
+
+		Category str[] = {
+			Java14Grammar.t_CLASS,
+			Java14Grammar.t_IDENTIFIER,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			Java14Grammar.t_RBRACE};
+
+		assertTrue(parser.recognize(str, Java14Grammar.n_class_declaration));
+	}
 }
