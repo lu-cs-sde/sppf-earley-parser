@@ -72,6 +72,38 @@ public class EarleyParserTest {
 		assertTrue(parser.recognize(str, s));
 	}
 
+	@Test public void testParse4() {
+		Grammar g = new Grammar();
+		Category a = new Category("a", true);
+		Category b = new Category("b", true);
+		Category c = new Category("c", true);
+
+		Category A = new Category("A", false);
+		Category B = new Category("B", false);
+		Category C = new Category("C", false);
+		Category S = new Category("S", false);
+
+		g.addRule(new Rule(A, a, b));
+		g.addRule(new Rule(A, a));
+		g.addRule(new Rule(A));
+
+		g.addRule(new Rule(B, a, b));
+		g.addRule(new Rule(B, b, c));
+		g.addRule(new Rule(B, b));
+		g.addRule(new Rule(B, c));
+		g.addRule(new Rule(B));
+
+		g.addRule(new Rule(C, b, c));
+		g.addRule(new Rule(C, c));
+		g.addRule(new Rule(C));
+
+		g.addRule(new Rule(S, A, B, C));
+
+		Category[] str = {a, b, c};
+		EarleyParser parser = new EarleyParser(g);
+		assertTrue(parser.recognize(str, S));
+	}
+
 	@Test public void testScottExample2() {
 
 
@@ -157,6 +189,8 @@ public class EarleyParserTest {
 			Java14Grammar.t_RBRACE,
 			Java14Grammar.t_RBRACE};
 
-		assertTrue(parser.recognize(str, Java14Grammar.n_class_declaration));
+		SPPFNode root = parser.parse(str, Java14Grammar.n_class_declaration);
+		assertNotNull(root);
+		Util.dumpParseResult("testJava2.dot", root, g);
 	}
 }

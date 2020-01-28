@@ -72,27 +72,16 @@ public class EarleyParser {
 		}
 
 		StateSet finalState = state[s.length];
-		System.out.println("===========================");
-		boolean recognized = false;
-		int count = 0;
+		if (DEBUG)
+			System.out.println("===========================");
 
 		for (EarleyItem item : finalState) {
 			if (item.isComplete() && item.start == 0 && item.rule.r.head == start) {
-				try {
-					PrintStream out = new PrintStream(new File("sppf_" + count++ + ".dot"));
-					DotVisitor visitor = new DotVisitor(out, grammar);
-					visitor.prologue();
-					item.getSPPF().accept(visitor);
-					visitor.epilogue();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				recognized = true;
+				return true;
 			}
 		}
 
-		return recognized;
+		return false;
 	}
 
 	public SPPFNode parse(Category s[], Category startSymbol) {
@@ -115,7 +104,9 @@ public class EarleyParser {
 	}
 
 	/**
-	   symbols - a zero terminated array of symbols
+	   @param symbols - a zero terminated array of symbols
+	   @param startSymbol - the start symbol for the grammar
+	   @return the state set computed by the Earley parsing algorithm
 	*/
 	private StateSet[] internalParseScott(int[] symbols, int startSymbol) {
 		StateSet[] state = new StateSet[symbols.length + 1];
@@ -140,7 +131,7 @@ public class EarleyParser {
 			Q_next = new StateSet();
 
 			while (!R.isEmpty()) {
-				// for hash sets this is not deterministic, this may be a problem...
+				// for hash sets the iteration order is not deterministic, this may be a problem...
 				EarleyItem Lambda = R.pickOne();
 				if (!Lambda.isComplete() && !isTerminal(Lambda.afterDot())) { // 1
 					for (EarleyRule r : rules.get(Lambda.afterDot())) { // 1.1
@@ -155,7 +146,7 @@ public class EarleyParser {
 						}
 					}
 
-					SPPFNode v = H.get(Lambda.afterDot()); // TODO: check that we never insert null
+					SPPFNode v = H.get(Lambda.afterDot());
 					if (v != null) { // 1.2
 						EarleyItem LambdaNext = Lambda.advance();
 						SPPFNode y = makeNode(LambdaNext.getDottedRule(), LambdaNext.start, i, Lambda.getSPPF(), v, V);
@@ -184,10 +175,11 @@ public class EarleyParser {
 						v.addEpsilon(); // 2.1.2
 					}
 					if (Lambda.start == i) { // 2.2
+						assert Lambda.getSPPF() != null;
 						H.put(Lambda.rule.r.head, Lambda.getSPPF());
 					}
 
-					// this is needed to avoid concurrent modification which occurs when Lambda.start == i
+					// this set is needed to avoid concurrent modification which occurs when Lambda.start == i
 					HashSet<EarleyItem> RTemp = new HashSet<>();
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
 						if (!item.isComplete() && item.afterDot() == Lambda.rule.r.head) {
@@ -195,7 +187,6 @@ public class EarleyParser {
 							SPPFNode y = makeNode(itemNext.getDottedRule(), itemNext.start, i, item.getSPPF(), Lambda.getSPPF(), V);
 							itemNext.setSPPF(y);
 							if (itemNext.isComplete() || !isTerminal(itemNext.afterDot())) { // 2.3.1
-								// assert i != Lambda.start;
 								if (!state[i].contains(itemNext)) { // 2.3.1
 									RTemp.add(itemNext);
 								}
