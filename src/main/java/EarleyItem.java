@@ -1,4 +1,4 @@
-public class EarleyItem {
+class EarleyItem {
 	final int start; // 0 means beginning of input
 	final DottedRule rule;
 	SPPFNode sppf;

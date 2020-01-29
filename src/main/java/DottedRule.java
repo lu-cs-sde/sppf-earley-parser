@@ -1,4 +1,4 @@
-public class DottedRule {
+class DottedRule {
 	final EarleyRule r;
 	final int dot;
 

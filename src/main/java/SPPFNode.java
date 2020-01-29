@@ -1,25 +1,26 @@
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 public class SPPFNode {
 	static class FamilyNode {
-		SPPFNode child1;
-		SPPFNode child2;
+		private SPPFNode[] child;
 
-		FamilyNode(SPPFNode child1, SPPFNode child2) {
-			this.child1 = child1;
-			this.child2 = child2;
+		FamilyNode(SPPFNode child0, SPPFNode child1) {
+			assert child0 != null || child1 == null;
+			child = new SPPFNode[2];
+			child[0] = child0;
+			child[1] = child1;
+		}
+
+		public SPPFNode getChild(int i) {
+			return child[i];
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((child1 == null) ? 0 : child1.hashCode());
-			result = prime * result + ((child2 == null) ? 0 : child2.hashCode());
+			result = prime * result + ((child[0] == null) ? 0 : child[0].hashCode());
+			result = prime * result + ((child[1] == null) ? 0 : child[1].hashCode());
 			return result;
 		}
 
@@ -32,15 +33,15 @@ public class SPPFNode {
 			if (getClass() != obj.getClass())
 				return false;
 			FamilyNode other = (FamilyNode) obj;
-			if (child1 == null) {
-				if (other.child1 != null)
+			if (child[0] == null) {
+				if (other.child[0] != null)
 					return false;
-			} else if (!child1.equals(other.child1))
+			} else if (!child[0].equals(other.child[0]))
 				return false;
-			if (child2 == null) {
-				if (other.child2 != null)
+			if (child[1] == null) {
+				if (other.child[1] != null)
 					return false;
-			} else if (!child2.equals(other.child2))
+			} else if (!child[1].equals(other.child[1]))
 				return false;
 			return true;
 		}
@@ -65,8 +66,8 @@ public class SPPFNode {
 		children.add(new FamilyNode(child, null));
 	}
 
-	public void addChildren(SPPFNode child1, SPPFNode child2) {
-		children.add(new FamilyNode(child1, child2));
+	public void addChildren(SPPFNode child0, SPPFNode child1) {
+		children.add(new FamilyNode(child0, child1));
 	}
 
 	public void addEpsilon() {

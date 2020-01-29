@@ -1,16 +1,9 @@
-import javax.swing.plaf.nimbus.State;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.TreeSet;
 
 public class EarleyParser {
 	private boolean DEBUG = true;
@@ -31,7 +24,7 @@ public class EarleyParser {
 		return grammar.toString();
 	}
 
-	class StateSet extends HashSet<EarleyItem> {
+	static class StateSet extends HashSet<EarleyItem> {
 		public StateSet(Collection<EarleyItem> c) {
 			super(c);
 		}
@@ -44,7 +37,6 @@ public class EarleyParser {
 			Iterator<EarleyItem> it = iterator();
 			if (it.hasNext()) {
 				EarleyItem item = it.next();
-				// the following is optional, let's see if it works
 				it.remove();
 				return item;
 			}
@@ -65,8 +57,7 @@ public class EarleyParser {
 			for (int i = 0; i < s.length + 1; ++i) {
 				System.out.println("=== Item set at position " + i + " ===");
 				for (EarleyItem item : state[i]) {
-					if (true || item.isComplete())
-						System.out.println(item.prettyPrint(grammar));
+					System.out.println(item.prettyPrint(grammar));
 				}
 			}
 		}

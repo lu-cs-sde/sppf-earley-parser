@@ -1,4 +1,4 @@
-public class EarleyRule implements Comparable<EarleyRule> {
+class EarleyRule implements Comparable<EarleyRule> {
 	final int body[];
 	final int head;
 
