@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;

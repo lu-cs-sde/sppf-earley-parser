@@ -1,4 +1,5 @@
 import static org.junit.Assert.*;
+import se.lth.sep.*;
 
 import org.junit.Test;
 

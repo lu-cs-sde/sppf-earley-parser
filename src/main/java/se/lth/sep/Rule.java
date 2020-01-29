@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 import java.util.Arrays;
 import java.util.List;
 

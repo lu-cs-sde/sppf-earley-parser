@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 class DottedRule {
 	final EarleyRule r;
 	final int dot;

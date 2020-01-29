@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 class EarleyItem {
 	final int start; // 0 means beginning of input
 	final DottedRule rule;

@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 public class Category {
 	private boolean isTerminal;
 	private String name;

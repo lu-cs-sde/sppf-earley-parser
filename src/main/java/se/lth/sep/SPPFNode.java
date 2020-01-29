@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 import java.util.HashSet;
 
 public class SPPFNode {

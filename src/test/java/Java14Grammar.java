@@ -1,3 +1,5 @@
+import se.lth.sep.*;
+
 class Java14Grammar {
 	public static Category t_error = new Category("error", /*terminal*/ true);
 	public static Category t_LBRACE = new Category("LBRACE", /*terminal*/ true);

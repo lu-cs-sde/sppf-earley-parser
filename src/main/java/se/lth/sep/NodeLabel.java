@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 public abstract class NodeLabel {
 	int start, end;
 	protected NodeLabel(int start, int end) {

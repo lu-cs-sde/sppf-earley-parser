@@ -1,3 +1,5 @@
+package se.lth.sep;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
