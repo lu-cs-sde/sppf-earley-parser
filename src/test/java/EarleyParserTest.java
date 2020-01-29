@@ -101,7 +101,9 @@ public class EarleyParserTest {
 
 		Category[] str = {a, b, c};
 		EarleyParser parser = new EarleyParser(g);
-		assertTrue(parser.recognize(str, S));
+		SPPFNode root = parser.parse(str, S);
+		assertNotNull(root);
+		Util.dumpParseResult("testParse4.dot", root, g);
 	}
 
 	@Test public void testScottExample2() {
