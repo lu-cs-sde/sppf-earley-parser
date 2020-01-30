@@ -8,6 +8,7 @@ public class Grammar {
 	private HashMap<Category, Integer> cat2int = new HashMap<>();
 	private HashMap<Integer, Category> int2cat = new HashMap<>();
 	private HashMap<Category, ArrayList<Rule>> grammarRules = new HashMap<>();
+	private HashMap<EarleyRule, Rule> earleyRule2GrammarRule = new HashMap<>();
 
 	private int nonTermIndex = 1;
 	private int termIndex = -1;
@@ -65,7 +66,9 @@ public class Grammar {
 				for (int j = 0; j < body.length; ++j) {
 					body[j] = cat2int.get(b.getBody().get(j));
 				}
-				eBodies.add(new EarleyRule(i, body));
+				EarleyRule eRule = new EarleyRule(i, body);
+				earleyRule2GrammarRule.put(eRule, b);
+				eBodies.add(eRule);
 			}
 			rules.add(eBodies);
 		}
@@ -96,5 +99,12 @@ public class Grammar {
 		if (i == null)
 			throw new EarleyException("Category not present in the gramamr");
 		return i;
+	}
+
+	public Rule getRule(EarleyRule rule) {
+		Rule r = earleyRule2GrammarRule.get(rule);
+		if (r == null)
+			throw new EarleyException("Rule not preset in the grammar");
+		return r;
 	}
 }
