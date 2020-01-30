@@ -3,7 +3,7 @@ package se.lth.sep;
 import java.util.HashSet;
 
 public class SPPFNode {
-	static class FamilyNode {
+	static public class FamilyNode {
 		private SPPFNode[] child;
 
 		FamilyNode(SPPFNode child0, SPPFNode child1) {
