@@ -84,6 +84,10 @@ public class SPPFNode {
 		visitor.visit(this);
 	}
 
+	public Iterable<FamilyNode> getChildren() {
+		return children;
+	}
+
 	public NodeLabel getLabel() {
 		return label;
 	}
