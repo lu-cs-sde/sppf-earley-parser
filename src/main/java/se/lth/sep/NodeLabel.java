@@ -1,7 +1,9 @@
 package se.lth.sep;
 
 public abstract class NodeLabel {
-	int start, end;
+	// this node covers the symbols [start, end) in the token array, where
+	// the array is indexed from 0.
+	final int start, end;
 	protected NodeLabel(int start, int end) {
 		this.start = start;
 		this.end = end;
@@ -19,4 +21,12 @@ public abstract class NodeLabel {
 	}
 
 	public abstract String prettyPrint(Grammar info);
+
+	public int getStart() {
+		return start;
+	}
+
+	public int getEnd() {
+		return end;
+	}
 }
