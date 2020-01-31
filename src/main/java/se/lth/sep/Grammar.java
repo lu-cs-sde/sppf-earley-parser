@@ -9,6 +9,7 @@ public class Grammar {
 	private HashMap<Integer, Category> int2cat = new HashMap<>();
 	private HashMap<Category, ArrayList<Rule>> grammarRules = new HashMap<>();
 	private HashMap<EarleyRule, Rule> earleyRule2GrammarRule = new HashMap<>();
+	private HashMap<String, Category> name2cat = new HashMap<>();
 
 	private int nonTermIndex = 1;
 	private int termIndex = -1;
@@ -29,6 +30,13 @@ public class Grammar {
 	private void addCategory(Category t) {
 		if (cat2int.containsKey(t))
 			return;
+
+		Category existingCat = name2cat.get(t.getName());
+		if (existingCat == null) {
+			name2cat.put(t.getName(), t);
+		} else if (existingCat != t) {
+			throw new EarleyException("Two categories with the same name in the grammar.");
+		}
 
 		if (t.isTerminal()) {
 			cat2int.put(t, termIndex);
@@ -91,6 +99,13 @@ public class Grammar {
 		Category c = int2cat.get(i);
 		if (c == null)
 			throw new EarleyException("Symbol index not present in the grammar");
+		return c;
+	}
+
+	public Category getCategory(String name) {
+		Category c = name2cat.get(name);
+		if (c == null)
+			throw new EarleyException("Category '" + name + "' not present in the grammar");
 		return c;
 	}
 
