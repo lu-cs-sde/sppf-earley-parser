@@ -1,6 +1,7 @@
 package se.lth.sep;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class SPPFNode {
 	static public class FamilyNode {
@@ -84,7 +85,7 @@ public class SPPFNode {
 		visitor.visit(this);
 	}
 
-	public Iterable<FamilyNode> getChildren() {
+	public Set<FamilyNode> getChildren() {
 		return children;
 	}
 
