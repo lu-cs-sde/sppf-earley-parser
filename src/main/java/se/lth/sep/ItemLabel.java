@@ -25,4 +25,12 @@ public class ItemLabel extends NodeLabel {
 	public DottedRule getDottedRule() {
 		return item;
 	}
+
+	public Rule getRule(Grammar g) {
+		return g.getRule(item.r);
+	}
+
+	public int getDotPosition() {
+		return item.dot;
+	}
 }

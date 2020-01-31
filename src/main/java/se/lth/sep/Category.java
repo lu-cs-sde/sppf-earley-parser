@@ -20,4 +20,8 @@ public class Category {
 	public boolean isTerminal() {
 		return isTerminal;
 	}
+
+	public String getName() {
+		return name;
+	}
 }
