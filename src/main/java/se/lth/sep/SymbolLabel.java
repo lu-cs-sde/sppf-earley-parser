@@ -22,7 +22,7 @@ public class SymbolLabel extends NodeLabel {
 		return info.getCategory(symbol).toString() + ", " + super.start + ", " + super.end;
 	}
 
-	public int getSymbol(Grammar info) {
-		return symbol;
+	public Category  getSymbol(Grammar info) {
+		return info.getCategory(symbol);
 	}
 }
