@@ -1,5 +1,6 @@
 package se.lth.sep;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,11 +8,29 @@ public class SPPFNode {
 	static public class FamilyNode {
 		private SPPFNode[] child;
 
+		FamilyNode(SPPFNode child0) {
+			assert child0 != null;
+			child = new SPPFNode[1];
+			child[0] = child0;
+		}
+
+		FamilyNode() {
+			child = new SPPFNode[0];
+		}
+
 		FamilyNode(SPPFNode child0, SPPFNode child1) {
-			assert child0 != null || child1 == null;
+			assert child0 != null || child1 != null;
 			child = new SPPFNode[2];
 			child[0] = child0;
 			child[1] = child1;
+		}
+
+		FamilyNode(SPPFNode children[]) {
+			child = Arrays.copyOf(children, children.length);
+		}
+
+		public int getNumChildren() {
+			return child.length;
 		}
 
 		public SPPFNode getChild(int i) {
@@ -20,10 +39,11 @@ public class SPPFNode {
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
+			final int prime = 47;
 			int result = 1;
-			result = prime * result + ((child[0] == null) ? 0 : child[0].hashCode());
-			result = prime * result + ((child[1] == null) ? 0 : child[1].hashCode());
+			for (int i = 0; i < child.length; ++i) {
+				result = prime * result + ((child[0] == null) ? 0 : child[0].hashCode());
+			}
 			return result;
 		}
 
@@ -36,16 +56,16 @@ public class SPPFNode {
 			if (getClass() != obj.getClass())
 				return false;
 			FamilyNode other = (FamilyNode) obj;
-			if (child[0] == null) {
-				if (other.child[0] != null)
-					return false;
-			} else if (!child[0].equals(other.child[0]))
+			if (other.child.length != child.length)
 				return false;
-			if (child[1] == null) {
-				if (other.child[1] != null)
+			for (int i = 0; i < child.length; ++i) {
+				if (child[i] == null) {
+					if (other.child[i] != null)
+						return false;
+				} else if (!child[i].equals(other.child[i])) {
 					return false;
-			} else if (!child[1].equals(other.child[1]))
-				return false;
+				}
+			}
 			return true;
 		}
 
@@ -66,7 +86,7 @@ public class SPPFNode {
 	}
 
 	public void addChild(SPPFNode child) {
-		children.add(new FamilyNode(child, null));
+		children.add(new FamilyNode(child));
 	}
 
 	public void addChildren(SPPFNode child0, SPPFNode child1) {
@@ -74,7 +94,7 @@ public class SPPFNode {
 	}
 
 	public void addEpsilon() {
-		children.add(new FamilyNode(null, null));
+		children.add(new FamilyNode());
 	}
 
 	public String prettyPrint(Grammar info) {

@@ -104,6 +104,11 @@ public class EarleyParserTest {
 		EarleyParser parser = new EarleyParser(g);
 		SPPFNode root = parser.parse(str, S);
 		assertNotNull(root);
+		Util.dumpParseResult("testParse4-bt.dot", root, g);
+
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+
 		Util.dumpParseResult("testParse4.dot", root, g);
 	}
 
@@ -194,6 +199,9 @@ public class EarleyParserTest {
 
 		SPPFNode root = parser.parse(str, Java14Grammar.n_class_declaration);
 		assertNotNull(root);
+		Util.dumpParseResult("testJava2-bt.dot", root, g);
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
 		Util.dumpParseResult("testJava2.dot", root, g);
 	}
 }

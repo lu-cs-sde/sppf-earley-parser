@@ -47,22 +47,17 @@ class DotVisitor implements SPPFNodeVisitor {
 		int currentID = nodeID++;
 		visitedFamilies.put(f, currentID);
 
-		if (f.getChild(0) == null) {
+		if (f.getNumChildren() == 0) {
 			// epsilon
 			ps.print(currentID + " [label=\u03b5];\n");
 		} else {
 			ps.print(currentID + " [shape=circle];\n");
-
-			f.getChild(0).accept(this);
-			if (f.getChild(1) != null) {
-				f.getChild(1).accept(this);
-			}
+			for (int i = 0; i < f.getNumChildren(); ++i)
+				f.getChild(i).accept(this);
 		}
 
-		if (f.getChild(0) != null)
-			ps.print(currentID + " -> " + visitedNodes.get(f.getChild(0)) + ";\n");
-		if (f.getChild(1) != null)
-			ps.print(currentID + " -> " + visitedNodes.get(f.getChild(1)) + ";\n");
+		for (int i = 0; i < f.getNumChildren(); ++i)
+			ps.print(currentID + " -> " + visitedNodes.get(f.getChild(i)) + ";\n");
 	}
 
 	@Override
