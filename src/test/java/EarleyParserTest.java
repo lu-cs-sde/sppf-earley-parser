@@ -176,6 +176,29 @@ public class EarleyParserTest {
 						  Java14Grammar.t_SEMICOLON};
 
 		assertTrue(parser.recognize(str, Java14Grammar.n_statement));
+
+		SPPFNode root = parser.parse(str, Java14Grammar.n_statement);
+		assertNotNull(root);
+		Util.dumpParseResult("testJava1-bt.dot", root, g);
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+		Util.dumpParseResult("testJava1.dot", root, g);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isTrivialProduction(Category head, Category body) {
+					String sig = head.getName() + "." + body.getName();
+					if (body.getName().equals("METAVARID"))
+						return true;
+					if (body.getName().equals("GAP"))
+						return true;
+					if (Java14Grammar.isTrivialRule(sig))
+						return true;
+					return false;
+				}
+			};
+		tpr.visit(root);
+		Util.dumpParseResult("testJava1-notr.dot", root, g);
+
 	}
 
 	@Test public void testJava2() {
@@ -200,8 +223,70 @@ public class EarleyParserTest {
 		SPPFNode root = parser.parse(str, Java14Grammar.n_class_declaration);
 		assertNotNull(root);
 		Util.dumpParseResult("testJava2-bt.dot", root, g);
+		// debinarize
 		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
 		dbv.visit(root);
 		Util.dumpParseResult("testJava2.dot", root, g);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isTrivialProduction(Category head, Category body) {
+					String sig = head.getName() + "." + body.getName();
+					if (body.getName().equals("METAVARID"))
+						return true;
+					if (body.getName().equals("GAP"))
+						return true;
+					if (Java14Grammar.isTrivialRule(sig))
+						return true;
+					return false;
+				}
+			};
+		tpr.visit(root);
+		Util.dumpParseResult("testJava2-notr.dot", root, g);
+	}
+
+	@Test public void testJava3() {
+		Grammar g = new Grammar();
+		Java14Grammar.addRules(g);
+
+		EarleyParser parser = new EarleyParser(g);
+		/* `a = `b.`c + `e.`f.`g() ; . */
+		Category str[] = {Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_EQ,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_DOT,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_PLUS,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_DOT,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_DOT,
+						  Java14Grammar.t_METAVARID,
+						  Java14Grammar.t_LPAREN,
+						  Java14Grammar.t_RPAREN,
+						  Java14Grammar.t_SEMICOLON};
+
+		assertTrue(parser.recognize(str, Java14Grammar.n_statement));
+
+		SPPFNode root = parser.parse(str, Java14Grammar.n_statement);
+		assertNotNull(root);
+		Util.dumpParseResult("testJava3-bt.dot", root, g);
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+		Util.dumpParseResult("testJava3.dot", root, g);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isTrivialProduction(Category head, Category body) {
+					String sig = head.getName() + "." + body.getName();
+					if (body.getName().equals("METAVARID"))
+						return true;
+					if (body.getName().equals("GAP"))
+						return true;
+					if (Java14Grammar.isTrivialRule(sig))
+						return true;
+					return false;
+				}
+			};
+		tpr.visit(root);
+		Util.dumpParseResult("testJava3-notr.dot", root, g);
 	}
 }
