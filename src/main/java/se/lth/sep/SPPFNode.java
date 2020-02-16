@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SPPFNode {
+public class SPPFNode implements Cloneable {
 	static public class FamilyNode {
 		private SPPFNode[] child;
 

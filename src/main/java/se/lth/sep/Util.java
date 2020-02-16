@@ -70,6 +70,8 @@ class DotVisitor implements SPPFNodeVisitor {
 
 		if (n.getLabel() instanceof ItemLabel) {
 			ps.print(currentID + " [shape=box,color=red,label=\"" + n.prettyPrint(info) + "\"];\n");
+		} else if (n.getChildren().size() > 1) {
+			ps.print(currentID + " [shape=box,color=red,label=\"" + n.prettyPrint(info) + "\"];\n");
 		} else {
 			ps.print(currentID + " [shape=box,label=\"" + n.prettyPrint(info) + "\"];\n");
 		}
