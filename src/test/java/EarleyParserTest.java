@@ -185,13 +185,10 @@ public class EarleyParserTest {
 		Util.dumpParseResult("testJava1.dot", root, g);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isTrivialProduction(Category head, Category body) {
-					String sig = head.getName() + "." + body.getName();
-					if (body.getName().equals("METAVARID"))
+				@Override public boolean isBubleUpChild(Category c) {
+					if (c.getName().equals("METAVARID"))
 						return true;
-					if (body.getName().equals("GAP"))
-						return true;
-					if (Java14Grammar.isTrivialRule(sig))
+					if (c.getName().equals("GAP"))
 						return true;
 					return false;
 				}
@@ -229,13 +226,10 @@ public class EarleyParserTest {
 		Util.dumpParseResult("testJava2.dot", root, g);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isTrivialProduction(Category head, Category body) {
-					String sig = head.getName() + "." + body.getName();
-					if (body.getName().equals("METAVARID"))
+				@Override public boolean isBubleUpChild(Category c) {
+					if (c.getName().equals("METAVARID"))
 						return true;
-					if (body.getName().equals("GAP"))
-						return true;
-					if (Java14Grammar.isTrivialRule(sig))
+					if (c.getName().equals("GAP"))
 						return true;
 					return false;
 				}
@@ -275,13 +269,10 @@ public class EarleyParserTest {
 		Util.dumpParseResult("testJava3.dot", root, g);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isTrivialProduction(Category head, Category body) {
-					String sig = head.getName() + "." + body.getName();
-					if (body.getName().equals("METAVARID"))
+				@Override public boolean isBubleUpChild(Category c) {
+					if (c.getName().equals("METAVARID"))
 						return true;
-					if (body.getName().equals("GAP"))
-						return true;
-					if (Java14Grammar.isTrivialRule(sig))
+					if (c.getName().equals("GAP"))
 						return true;
 					return false;
 				}
@@ -323,11 +314,10 @@ public class EarleyParserTest {
 
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isTrivialProduction(Category head, Category body) {
-					String sig = head.getName() + "." + body.getName();
-					if (body.getName().equals("METAVARID"))
+				@Override public boolean isBubleUpChild(Category c) {
+					if (c.getName().equals("METAVARID"))
 						return true;
-					if (body.getName().equals("GAP"))
+					if (c.getName().equals("GAP"))
 						return true;
 					return false;
 				}

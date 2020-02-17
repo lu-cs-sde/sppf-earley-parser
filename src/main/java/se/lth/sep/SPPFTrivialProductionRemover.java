@@ -32,60 +32,55 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 			return;
 		}
 
-		Set<SPPFNode.FamilyNode> children = n.getChildren();
+
+		for (SPPFNode.FamilyNode f : n.getChildren()) {
+			f.accept(this);
+		}
 
 		HashSet<SPPFNode.FamilyNode> newChildren = new HashSet<>();
 		HashSet<SPPFNode.FamilyNode> childrenToRemove = new HashSet<>();
 
-		for (SPPFNode.FamilyNode f : children) {
-			f.accept(this);
+		for (SPPFNode.FamilyNode f : n.getChildren()) {
 
-			if (f.getNumChildren() == 0)
+			if (f.getNumChildren() != 1)
 				continue;
+			SPPFNode[] childArray = new SPPFNode[f.getNumChildren()];
+			boolean updatedChildren = false;
+			for (int i = 0; i < f.getNumChildren(); ++i) {
+				childArray[i] = f.getChild(i);
+			}
 
 			for (int i = 0; i < f.getNumChildren(); ++i) {
-				SPPFNode ruleNode = f.getChild(i);
-				assert ruleNode.getLabel() instanceof SymbolLabel;
-				Category head = ((SymbolLabel)ruleNode.getLabel()).getSymbol(grammar);
+				SPPFNode bubbleUpChild = null;
+				SPPFNode nn = f.getChild(i);
 
-				boolean allProductionAreTrivial = true;
-				for (SPPFNode.FamilyNode g : ruleNode.getChildren()) {
-					if (g.getNumChildren() != 1) {
-						allProductionAreTrivial = false;
-						break;
-					}
+				for (SPPFNode.FamilyNode ff : nn.getChildren()) {
+					if (ff.getNumChildren() != 1)
+						continue;
 
-					Category body = ((SymbolLabel)g.getChild(0).getLabel()).getSymbol(grammar);
-					if (!isTrivialProduction(head, body)) {
-						allProductionAreTrivial = false;
+					SymbolLabel label = (SymbolLabel)ff.getChild(0).getLabel();
+					if (isBubleUpChild(label.getSymbol(grammar))) {
+						bubbleUpChild = ff.getChild(0);
 						break;
 					}
 				}
 
-				if (!allProductionAreTrivial)
-					continue;
-
-				for (SPPFNode.FamilyNode g : ruleNode.getChildren()) {
-					SPPFNode[] childArray = new SPPFNode[f.getNumChildren()];
-					for (int j = 0; j < f.getNumChildren(); ++j) {
-						if (i == j) {
-							childArray[j] = g.getChild(0);
-						} else {
-							childArray[j] = f.getChild(j);
-						}
-					}
-
-					newChildren.add(new SPPFNode.FamilyNode(childArray));
-					childrenToRemove.add(f);
+				if (bubbleUpChild != null) {
+					childArray[i] = bubbleUpChild;
+					updatedChildren = true;
 				}
+			}
+			if (updatedChildren) {
+				childrenToRemove.add(f);
+				newChildren.add(new FamilyNode(childArray));
 			}
 		}
 
-		children.removeAll(childrenToRemove);
-		children.addAll(newChildren);
+		n.getChildren().removeAll(childrenToRemove);
+		n.getChildren().addAll(newChildren);
 	}
 
-	public boolean isTrivialProduction(Category head, Category body) {
+	public boolean isBubleUpChild(Category c) {
 		return false;
 	}
 }

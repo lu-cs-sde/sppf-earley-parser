@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SPPFNode implements Cloneable {
+public class SPPFNode {
 	static public class FamilyNode {
 		private SPPFNode[] child;
 
@@ -42,7 +42,7 @@ public class SPPFNode implements Cloneable {
 			final int prime = 47;
 			int result = 1;
 			for (int i = 0; i < child.length; ++i) {
-				result = prime * result + ((child[0] == null) ? 0 : child[0].hashCode());
+				result = prime * result + ((child[i] == null) ? 0 : child[i].hashCode());
 			}
 			return result;
 		}
