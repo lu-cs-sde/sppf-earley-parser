@@ -1,4 +1,7 @@
 import static org.junit.Assert.*;
+
+import java.util.List;
+
 import se.lth.sep.*;
 
 import org.junit.Test;
@@ -195,7 +198,10 @@ public class EarleyParserTest {
 			};
 		tpr.visit(root);
 		Util.dumpParseResult("testJava1-notr.dot", root, g);
-
+		// dump the parse trees
+		ParseTreeGenerator ptg = new ParseTreeGenerator(g, root);
+		List<ParseTree> pts = ptg.getParseTrees();
+		Util.dumpParseTrees("testJava1-parse-tree", pts);
 	}
 
 	@Test public void testJava2() {
@@ -236,6 +242,11 @@ public class EarleyParserTest {
 			};
 		tpr.visit(root);
 		Util.dumpParseResult("testJava2-notr.dot", root, g);
+
+		// dump the parse trees
+		ParseTreeGenerator ptg = new ParseTreeGenerator(g, root);
+		List<ParseTree> pts = ptg.getParseTrees();
+		Util.dumpParseTrees("testJava2-parse-tree", pts);
 	}
 
 	@Test public void testJava3() {

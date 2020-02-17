@@ -2,6 +2,7 @@ package se.lth.sep;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 public class Grammar {
@@ -121,5 +122,16 @@ public class Grammar {
 		if (r == null)
 			throw new EarleyException("Rule not preset in the grammar");
 		return r;
+	}
+
+	public Rule getRule(Category head, List<Category> body) {
+		List<Rule> ruleList = grammarRules.get(head);
+		if (ruleList == null)
+			return null;
+		for (Rule r : ruleList) {
+			if (r.getBody().equals(body))
+				return r;
+		}
+		return null;
 	}
 }

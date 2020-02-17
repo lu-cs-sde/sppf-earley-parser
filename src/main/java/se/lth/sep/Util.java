@@ -3,7 +3,12 @@ package se.lth.sep;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public class Util {
 	public static void dumpParseResult(String dotFileName, SPPFNode node, Grammar grammar) {
@@ -16,6 +21,65 @@ public class Util {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static int dumpParseTree(PrintStream ps, ParseTree pt, MutableInt count) {
+		int currentID = count.getAndIncrement();
+		ps.println(currentID + " [shape=box,label=\"" + pt.getCategory().getName() + "\"];");
+		for (ParseTree c : pt.getChildren()) {
+			int childID = dumpParseTree(ps, c, count);
+			ps.println(currentID + " -> " + childID + ";");
+		}
+		return currentID;
+	}
+
+	public static void dumpParseTree(String dotFileName, ParseTree pt) {
+		try {
+			PrintStream out = new PrintStream(new File(dotFileName));
+			out.println("digraph G {");
+			dumpParseTree(out, pt, new MutableInt(0));
+			out.println("}");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void dumpParseTrees(String dotFilePrefix, Collection<ParseTree> pts) {
+		int index = 0;
+		for (ParseTree pt : pts) {
+			index++;
+			dumpParseTree(dotFilePrefix + "_" + index + ".dot", pt);
+		}
+	}
+
+	public static<T> LinkedList<LinkedList<T>> product(Iterator<LinkedList<T>> children) {
+		if (!children.hasNext()) {
+			return new LinkedList<>();
+		}
+
+		LinkedList<T> head = children.next();
+		LinkedList<LinkedList<T>> tail = product(children);
+
+		LinkedList<LinkedList<T>> result = new LinkedList<>();
+		if (tail.isEmpty()) {
+			for (T t : head) {
+				LinkedList<T> singleton = new LinkedList<T>();
+				singleton.add(t);
+				result.add(singleton);
+			}
+			return result;
+		}
+
+		for (T t : head) {
+			for (LinkedList<T> tt : tail) {
+				LinkedList<T> childList = new LinkedList<>();
+				childList.add(t);
+				childList.addAll(tt);
+				result.add(childList);
+			}
+		}
+
+		return result;
 	}
 }
 
