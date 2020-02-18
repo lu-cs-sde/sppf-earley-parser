@@ -7,6 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+/**
+   This is an implementation of the parsing algorithm described by
+   Elizabeth Scott in the paper "SPPF-Style Parsing From Earley Recognisers",
+   https://doi.org/10.1016/j.entcs.2008.03.044 .
+ */
 public class EarleyParser {
 	private boolean DEBUG = true;
 
