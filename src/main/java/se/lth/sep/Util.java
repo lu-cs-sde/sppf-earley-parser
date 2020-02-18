@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -83,6 +84,26 @@ public class Util {
 		}
 
 		return result;
+	}
+
+	public List<ParseTree> enumerateParseTrees(SPPFNode root,
+											   Grammar grammar,
+											   SPPFTrivialProductionRemover tpr) {
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+
+		// decorate nodes with the grammar rules
+		SPPFNodeDecorator dec = new SPPFNodeDecorator(grammar);
+		dec.visit(root);
+
+		// remove trivial productions
+		tpr.visit(root);
+
+		// generate all the possible parse trees
+		ParseTreeGenerator ptg = new ParseTreeGenerator(grammar, root);
+		List<ParseTree> pts = ptg.getParseTrees();
+
+		return pts;
 	}
 }
 

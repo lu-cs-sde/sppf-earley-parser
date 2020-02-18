@@ -33,6 +33,3 @@ subprojects {
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
 }
-
-// Define the main class for the application
-mainClassName = 'Schedule'
