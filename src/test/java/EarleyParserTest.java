@@ -421,14 +421,6 @@ public class EarleyParserTest {
 
 		SPPFNode root = parser.parse(str, Java14Grammar.n_class_declaration);
 		assertNotNull(root);
-		Util.dumpParseResult("testJava5-bt.dot", root, g);
-		// debinarize
-		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
-		dbv.visit(root);
-		Util.dumpParseResult("testJava5.dot", root, g);
-		// decorate nodes with the grammar rules
-		SPPFNodeDecorator dec = new SPPFNodeDecorator(g);
-		dec.visit(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
 				@Override public boolean isBubleUpChild(Category c) {
@@ -439,12 +431,7 @@ public class EarleyParserTest {
 					return false;
 				}
 			};
-		tpr.visit(root);
-		Util.dumpParseResult("testJava5-notr.dot", root, g);
-
-		// dump the parse trees
-		ParseTreeGenerator ptg = new ParseTreeGenerator(g, root);
-		List<ParseTree> pts = ptg.getParseTrees();
+		List<ParseTree> pts = Util.enumerateParseTrees(root, g, tpr);
 		// the parsing should produce 3^6 parse trees
 		assertEquals(3*3*3*3*3*3, pts.size());
 		Util.dumpParseTrees("testJava5-parse-tree", pts);

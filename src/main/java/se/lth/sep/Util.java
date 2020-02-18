@@ -86,9 +86,9 @@ public class Util {
 		return result;
 	}
 
-	public List<ParseTree> enumerateParseTrees(SPPFNode root,
-											   Grammar grammar,
-											   SPPFTrivialProductionRemover tpr) {
+	static public List<ParseTree> enumerateParseTrees(SPPFNode root,
+													  Grammar grammar,
+													  SPPFTrivialProductionRemover tpr) {
 		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
 		dbv.visit(root);
 
