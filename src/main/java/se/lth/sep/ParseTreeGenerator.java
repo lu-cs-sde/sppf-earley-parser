@@ -67,7 +67,12 @@ public class ParseTreeGenerator implements SPPFNodeVisitor {
 			LinkedList<LinkedList<ParseTree>> childAlternatives = familyMap.get(f);
 
 			for (LinkedList<ParseTree> childAlternative : childAlternatives) {
-				ParseTree pt = new ParseTree(c, start, end);
+				ParseTree pt;
+				if (f.getInfo() != null) {
+					pt = new ParseTree( (Rule)f.getInfo(), start, end);
+				} else {
+					pt = new ParseTree(c, start, end);
+				}
 				pt.addChildren(childAlternative);
 				result.add(pt);
 			}

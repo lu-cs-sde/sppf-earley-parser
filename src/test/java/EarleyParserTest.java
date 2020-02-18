@@ -186,6 +186,9 @@ public class EarleyParserTest {
 		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
 		dbv.visit(root);
 		Util.dumpParseResult("testJava1.dot", root, g);
+		// decorate nodes with the grammar rules
+		SPPFNodeDecorator dec = new SPPFNodeDecorator(g);
+		dec.visit(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
 				@Override public boolean isBubleUpChild(Category c) {
@@ -230,6 +233,9 @@ public class EarleyParserTest {
 		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
 		dbv.visit(root);
 		Util.dumpParseResult("testJava2.dot", root, g);
+		// decorate nodes with the grammar rules
+		SPPFNodeDecorator dec = new SPPFNodeDecorator(g);
+		dec.visit(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
 				@Override public boolean isBubleUpChild(Category c) {
@@ -337,4 +343,110 @@ public class EarleyParserTest {
 		Util.dumpParseResult("testJava4-notr.dot", root, g);
 	}
 
+
+	@Test public void testJava5() {
+		// This test is expected should finish in a reasonable ammount of time (~10s).
+		Grammar g = new Grammar();
+		Java14Grammar.addRules(g);
+
+		EarleyParser parser = new EarleyParser(g);
+
+		Category str[] = {
+			Java14Grammar.t_CLASS,
+			Java14Grammar.t_IDENTIFIER,
+			Java14Grammar.t_LBRACE,
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+
+			// start ambigous constructor/method declaration
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_METAVARID,
+			Java14Grammar.t_LPAREN,
+			Java14Grammar.t_RPAREN,
+			Java14Grammar.t_LBRACE,
+			Java14Grammar.t_GAP,
+			Java14Grammar.t_RBRACE,
+			// end ambigous constructor/method declaration
+
+			Java14Grammar.t_RBRACE};
+
+		SPPFNode root = parser.parse(str, Java14Grammar.n_class_declaration);
+		assertNotNull(root);
+		Util.dumpParseResult("testJava5-bt.dot", root, g);
+		// debinarize
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+		Util.dumpParseResult("testJava5.dot", root, g);
+		// decorate nodes with the grammar rules
+		SPPFNodeDecorator dec = new SPPFNodeDecorator(g);
+		dec.visit(root);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isBubleUpChild(Category c) {
+					if (c.getName().equals("METAVARID"))
+						return true;
+					if (c.getName().equals("GAP"))
+						return true;
+					return false;
+				}
+			};
+		tpr.visit(root);
+		Util.dumpParseResult("testJava5-notr.dot", root, g);
+
+		// dump the parse trees
+		ParseTreeGenerator ptg = new ParseTreeGenerator(g, root);
+		List<ParseTree> pts = ptg.getParseTrees();
+		// the parsing should produce 3^6 parse trees
+		assertEquals(3*3*3*3*3*3, pts.size());
+		Util.dumpParseTrees("testJava5-parse-tree", pts);
+	}
 }

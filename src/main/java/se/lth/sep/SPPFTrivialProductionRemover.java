@@ -41,9 +41,6 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 		HashSet<SPPFNode.FamilyNode> childrenToRemove = new HashSet<>();
 
 		for (SPPFNode.FamilyNode f : n.getChildren()) {
-
-			if (f.getNumChildren() != 1)
-				continue;
 			SPPFNode[] childArray = new SPPFNode[f.getNumChildren()];
 			boolean updatedChildren = false;
 			for (int i = 0; i < f.getNumChildren(); ++i) {
@@ -70,9 +67,13 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 					updatedChildren = true;
 				}
 			}
+
 			if (updatedChildren) {
+				FamilyNode newf = new FamilyNode(childArray);
+				// preserve the info
+				newf.setInfo(f.getInfo());
 				childrenToRemove.add(f);
-				newChildren.add(new FamilyNode(childArray));
+				newChildren.add(newf);
 			}
 		}
 

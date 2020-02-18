@@ -4,11 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
-   A visitor that removes the nodes that contain dottet rules.
+   A visitor that removes the nodes that contain dotted rules.
 */
 public class SPPFDebinarizeVisitor implements SPPFNodeVisitor {
-
-
 	private HashSet<SPPFNode> visitedNodes = new HashSet<>();
 	private HashSet<SPPFNode.FamilyNode> visitedFamNodes = new HashSet<>();
 

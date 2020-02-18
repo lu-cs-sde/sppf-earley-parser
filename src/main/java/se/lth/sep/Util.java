@@ -25,7 +25,10 @@ public class Util {
 
 	private static int dumpParseTree(PrintStream ps, ParseTree pt, MutableInt count) {
 		int currentID = count.getAndIncrement();
-		ps.println(currentID + " [shape=box,label=\"" + pt.getCategory().getName() + "\"];");
+		String label = pt.getRule() != null ?
+			pt.getRule().prettyPrint() : pt.getCategory().getName();
+		ps.println(currentID + " [shape=box,label=\"" + label + "\"" +
+				   (pt.getRule() == null ? ",color=red" : "") + "];");
 		for (ParseTree c : pt.getChildren()) {
 			int childID = dumpParseTree(ps, c, count);
 			ps.println(currentID + " -> " + childID + ";");

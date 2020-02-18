@@ -7,6 +7,7 @@ import java.util.Set;
 public class SPPFNode {
 	static public class FamilyNode {
 		private SPPFNode[] child;
+		private Object info = null;
 
 		FamilyNode(SPPFNode child0) {
 			assert child0 != null;
@@ -72,10 +73,19 @@ public class SPPFNode {
 		public void accept(SPPFNodeVisitor visitor) {
 			visitor.visit(this);
 		}
+
+		void setInfo(Object info) {
+			this.info = info;
+		}
+
+		Object getInfo() {
+			return info;
+		}
 	}
 
 	HashSet<FamilyNode> children = new HashSet<>();
 	private NodeLabel label;
+	private Object info = null;
 
 	public SPPFNode() {
 		label = null;
@@ -111,5 +121,13 @@ public class SPPFNode {
 
 	public NodeLabel getLabel() {
 		return label;
+	}
+
+	void setInfo(Object info) {
+		this.info = info;
+	}
+
+	Object getInfo() {
+		return info;
 	}
 }

@@ -20,6 +20,19 @@ public class Rule {
 		this.action = act;
 	}
 
+	public String prettyPrint() {
+		String s = head.getName() + " -> ";
+		if (body.length == 0) {
+			s += "\u03b5";
+			return s;
+		}
+
+		for (Category c : body) {
+			s += c.getName() + " ";
+		}
+		return s;
+	}
+
 	public SemanticAction getAction() {
 		return action;
 	}
