@@ -9,7 +9,7 @@ public abstract class SemanticAction {
 			@Override public Object act(List<Object> children) { return null; }
 		};
 
-	public static SemanticAction PASSTROUGH = new SemanticAction() {
+	public static SemanticAction PASSTHROUGH = new SemanticAction() {
 			@Override public Object act(List<Object> children) { return children.get(0); }
 		};
 }
