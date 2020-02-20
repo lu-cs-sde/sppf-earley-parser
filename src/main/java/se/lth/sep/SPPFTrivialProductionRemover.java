@@ -39,6 +39,7 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 
 		HashSet<SPPFNode.FamilyNode> newChildren = new HashSet<>();
 		HashSet<SPPFNode.FamilyNode> childrenToRemove = new HashSet<>();
+		Category nc = ((SymbolLabel)n.getLabel()).getSymbol(grammar);
 
 		for (SPPFNode.FamilyNode f : n.getChildren()) {
 			SPPFNode[] childArray = new SPPFNode[f.getNumChildren()];
@@ -56,7 +57,7 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 						continue;
 
 					SymbolLabel label = (SymbolLabel)ff.getChild(0).getLabel();
-					if (isBubleUpChild(label.getSymbol(grammar))) {
+					if (isBubleUpChild(nc, label.getSymbol(grammar))) {
 						bubbleUpChild = ff.getChild(0);
 						break;
 					}
@@ -81,7 +82,7 @@ public class SPPFTrivialProductionRemover implements SPPFNodeVisitor {
 		n.getChildren().addAll(newChildren);
 	}
 
-	public boolean isBubleUpChild(Category c) {
+	public boolean isBubleUpChild(Category p, Category c) {
 		return false;
 	}
 }

@@ -191,7 +191,7 @@ public class EarleyParserTest {
 		dec.visit(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isBubleUpChild(Category c) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
 					if (c.getName().equals("METAVARID"))
 						return true;
 					if (c.getName().equals("GAP"))
@@ -238,7 +238,7 @@ public class EarleyParserTest {
 		dec.visit(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isBubleUpChild(Category c) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
 					if (c.getName().equals("METAVARID"))
 						return true;
 					if (c.getName().equals("GAP"))
@@ -286,7 +286,7 @@ public class EarleyParserTest {
 		Util.dumpParseResult("testJava3.dot", root, g);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isBubleUpChild(Category c) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
 					if (c.getName().equals("METAVARID"))
 						return true;
 					if (c.getName().equals("GAP"))
@@ -331,7 +331,7 @@ public class EarleyParserTest {
 
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isBubleUpChild(Category c) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
 					if (c.getName().equals("METAVARID"))
 						return true;
 					if (c.getName().equals("GAP"))
@@ -423,7 +423,7 @@ public class EarleyParserTest {
 		assertNotNull(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
-				@Override public boolean isBubleUpChild(Category c) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
 					if (c.getName().equals("METAVARID"))
 						return true;
 					if (c.getName().equals("GAP"))
