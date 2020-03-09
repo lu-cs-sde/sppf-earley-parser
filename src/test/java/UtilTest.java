@@ -17,11 +17,13 @@ public class UtilTest {
 		LinkedList<LinkedList<Integer>> ll = new LinkedList<>(Arrays.asList(l1, l2, l3));
 		LinkedList<LinkedList<Integer>> r = Util.<Integer>product(ll.iterator());
 
-		for (LinkedList<Integer> li : r) {
-			for (int i : li) {
-				System.out.print(i + ", ");
-			}
-			System.out.println();
-		}
+		assertEquals(18, r.size());
+
+		// for (LinkedList<Integer> li : r) {
+		// 	for (int i : li) {
+		// 		System.out.print(i + ", ");
+		// 	}
+		// 	System.out.println();
+		// }
 	}
 }

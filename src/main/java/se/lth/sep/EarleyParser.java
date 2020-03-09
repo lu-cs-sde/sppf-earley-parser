@@ -13,7 +13,7 @@ import java.util.TreeSet;
    https://doi.org/10.1016/j.entcs.2008.03.044 .
  */
 public class EarleyParser {
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 
 	private ArrayList<TreeSet<EarleyRule>> rules;
 	private Grammar grammar;

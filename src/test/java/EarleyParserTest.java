@@ -35,7 +35,6 @@ public class EarleyParserTest {
 
 	@Test public void testToString() {
 		EarleyParser parser = makeParser();
-		System.out.println(parser);
 		assertEquals("s -> s <+> p \ns -> p \np -> p <*> t \np -> t \nt -> <VAR> \nt -> <NUM> \n",
 				parser.toString());
 	}
@@ -473,7 +472,6 @@ public class EarleyParserTest {
 		Grammar g = new Grammar();
 		Java15Grammar.addRules(g);
 		EarleyParser parser = new EarleyParser(g);
-		System.out.println(g);
 
 		/* enum E { .., MetaVarID,..; } */
 		Category str[] = {
