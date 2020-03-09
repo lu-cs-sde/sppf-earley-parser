@@ -90,6 +90,17 @@ public class EarleyParser {
 		int start = grammar.getInternalSymbol(startSymbol);
 
 		StateSet[] state = internalParseScott(symbols, start);
+
+		if (DEBUG) {
+			for (int i = 0; i < s.length + 1; ++i) {
+				System.out.println("=== Item set at position " + i + " ===");
+				for (EarleyItem item : state[i]) {
+					System.out.println(item.prettyPrint(grammar));
+				}
+			}
+			System.out.println("===========================");
+		}
+
 		StateSet finalState = state[s.length];
 
 		for (EarleyItem item : finalState) {

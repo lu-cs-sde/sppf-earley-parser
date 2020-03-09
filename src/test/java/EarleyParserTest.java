@@ -436,4 +436,78 @@ public class EarleyParserTest {
 		assertEquals(3*3*3*3*3*3, pts.size());
 		Util.dumpParseTrees("testJava5-parse-tree", pts);
 	}
+
+	@Test public void testJava6() {
+		Grammar g = new Grammar();
+		Java15Grammar.addRules(g);
+
+		EarleyParser parser = new EarleyParser(g);
+
+		/* enum E { ID } */
+		Category str[] = {
+			Java15Grammar.t_ENUM,
+			Java15Grammar.t_IDENTIFIER,
+			Java15Grammar.t_LBRACE,
+			Java15Grammar.t_IDENTIFIER,
+			Java15Grammar.t_RBRACE
+		};
+
+		SPPFNode root = parser.parse(str, Java15Grammar.n_enum_declaration);
+		assertNotNull(root);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
+					if (c.getName().equals("METAVARID"))
+						return true;
+					if (c.getName().equals("GAP"))
+						return true;
+					return false;
+				}
+			};
+		List<ParseTree> pts = Util.enumerateParseTrees(root, g, tpr);
+		Util.dumpParseTrees("testJava6-parse-tree", pts);
+		assertEquals(1, pts.size());
+	}
+
+	@Test public void testJava7() {
+		Grammar g = new Grammar();
+		Java15Grammar.addRules(g);
+		EarleyParser parser = new EarleyParser(g);
+		System.out.println(g);
+
+		/* enum E { .., MetaVarID,..; } */
+		Category str[] = {
+			Java15Grammar.t_ENUM,
+			Java15Grammar.t_IDENTIFIER,
+			Java15Grammar.t_LBRACE,
+			Java15Grammar.t_GAP,
+			Java15Grammar.t_COMMA,
+			Java15Grammar.t_IDENTIFIER,
+			Java15Grammar.t_COMMA,
+			Java15Grammar.t_GAP,
+			Java15Grammar.t_SEMICOLON,
+			Java15Grammar.t_INT,
+			Java15Grammar.t_IDENTIFIER,
+			Java15Grammar.t_SEMICOLON,
+			Java15Grammar.t_RBRACE
+		};
+
+		SPPFNode root = parser.parse(str, Java15Grammar.n_enum_declaration);
+		assertNotNull(root);
+		// remove trivial productions
+		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
+				@Override public boolean isBubleUpChild(Category p, Category c) {
+					if (c.getName().equals("METAVARID"))
+						return true;
+					if (c.getName().equals("GAP"))
+						return true;
+					return false;
+				}
+			};
+
+
+		List<ParseTree> pts = Util.enumerateParseTrees(root, g, tpr);
+		Util.dumpParseTrees("testJava7-parse-tree", pts);
+		assertEquals(1, pts.size());
+	}
 }
