@@ -438,20 +438,21 @@ public class EarleyParserTest {
 
 	@Test public void testJava6() {
 		Grammar g = new Grammar();
-		Java15Grammar.addRules(g);
+		Java8Grammar.addRules1(g);
+		Java8Grammar.addRules2(g);
 
 		EarleyParser parser = new EarleyParser(g);
 
 		/* enum E { ID } */
 		Category str[] = {
-			Java15Grammar.t_ENUM,
-			Java15Grammar.t_IDENTIFIER,
-			Java15Grammar.t_LBRACE,
-			Java15Grammar.t_IDENTIFIER,
-			Java15Grammar.t_RBRACE
+			Java8Grammar.t_ENUM,
+			Java8Grammar.t_IDENTIFIER,
+			Java8Grammar.t_LBRACE,
+			Java8Grammar.t_IDENTIFIER,
+			Java8Grammar.t_RBRACE
 		};
 
-		SPPFNode root = parser.parse(str, Java15Grammar.n_enum_declaration);
+		SPPFNode root = parser.parse(str, Java8Grammar.n_enum_declaration);
 		assertNotNull(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
@@ -470,27 +471,28 @@ public class EarleyParserTest {
 
 	@Test public void testJava7() {
 		Grammar g = new Grammar();
-		Java15Grammar.addRules(g);
+		Java8Grammar.addRules1(g);
+		Java8Grammar.addRules2(g);
 		EarleyParser parser = new EarleyParser(g);
 
 		/* enum E { .., MetaVarID,..; } */
 		Category str[] = {
-			Java15Grammar.t_ENUM,
-			Java15Grammar.t_IDENTIFIER,
-			Java15Grammar.t_LBRACE,
-			Java15Grammar.t_GAP,
-			Java15Grammar.t_COMMA,
-			Java15Grammar.t_IDENTIFIER,
-			Java15Grammar.t_COMMA,
-			Java15Grammar.t_GAP,
-			Java15Grammar.t_SEMICOLON,
-			Java15Grammar.t_INT,
-			Java15Grammar.t_IDENTIFIER,
-			Java15Grammar.t_SEMICOLON,
-			Java15Grammar.t_RBRACE
+			Java8Grammar.t_ENUM,
+			Java8Grammar.t_IDENTIFIER,
+			Java8Grammar.t_LBRACE,
+			Java8Grammar.t_GAP,
+			Java8Grammar.t_COMMA,
+			Java8Grammar.t_IDENTIFIER,
+			Java8Grammar.t_COMMA,
+			Java8Grammar.t_GAP,
+			Java8Grammar.t_SEMICOLON,
+			Java8Grammar.t_INT,
+			Java8Grammar.t_IDENTIFIER,
+			Java8Grammar.t_SEMICOLON,
+			Java8Grammar.t_RBRACE
 		};
 
-		SPPFNode root = parser.parse(str, Java15Grammar.n_enum_declaration);
+		SPPFNode root = parser.parse(str, Java8Grammar.n_enum_declaration);
 		assertNotNull(root);
 		// remove trivial productions
 		SPPFTrivialProductionRemover tpr = new SPPFTrivialProductionRemover(g) {
