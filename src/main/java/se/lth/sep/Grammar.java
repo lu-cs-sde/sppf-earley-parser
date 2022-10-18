@@ -17,6 +17,8 @@ public class Grammar {
 
 	ArrayList<TreeSet<EarleyRule>> rules;
 
+	public final Category t_EPSILON = new Category("\u03b5", true);
+
 	public ArrayList<TreeSet<EarleyRule>> getInternalRules() {
 		// lazily initialize the rule table
 		if (rules == null)
@@ -25,7 +27,7 @@ public class Grammar {
 	}
 
 	public Grammar() {
-
+		addCategory(t_EPSILON);
 	}
 
 	private void addCategory(Category t) {
@@ -52,8 +54,12 @@ public class Grammar {
 
 	public void addRule(Rule r) {
 		addCategory(r.getHead());
-		for (Category c : r.getBody())
+		for (Category c : r.getBody()) {
+			if (c.equals(t_EPSILON)) {
+				throw new EarleyException("Do not explicitly use the EPSILON category in the grammar. Use rules with an empty body instead.");
+			}
 			addCategory(c);
+		}
 
 		ArrayList<Rule> list = grammarRules.get(r.getHead());
 		if (list == null) {

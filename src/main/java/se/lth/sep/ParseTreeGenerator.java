@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 import se.lth.sep.SPPFNode.FamilyNode;
 
@@ -36,8 +37,14 @@ public class ParseTreeGenerator implements SPPFNodeVisitor {
 		}
 
 		LinkedList<LinkedList<ParseTree>> childrenTrees = new LinkedList<>();
-		for (int i = 0; i < f.getNumChildren(); ++i) {
-			childrenTrees.add(nodeMap.get(f.getChild(i)));
+
+		if (f.getNumChildren() != 0 ) {
+			for (int i = 0; i < f.getNumChildren(); ++i) {
+				childrenTrees.add(nodeMap.get(f.getChild(i)));
+			}
+		} else {
+			// epsilon
+			childrenTrees.add(new LinkedList<>(Collections.singletonList(new ParseTree(grammar.t_EPSILON, 0, 0))));
 		}
 
 		LinkedList<LinkedList<ParseTree>> childrenCombinations = Util.<ParseTree>product(childrenTrees.iterator());
