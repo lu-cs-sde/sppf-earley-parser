@@ -510,4 +510,99 @@ public class EarleyParserTest {
 		Util.dumpParseTrees("testJava7-parse-tree", pts);
 		assertEquals(1, pts.size());
 	}
+
+	@Test public void testParseList() {
+		Grammar g = new Grammar();
+		Category a = new Category("a", true);
+		Category b = new Category("b", true);
+
+		Category E = new Category("LE", false);
+		g.addRule(new Rule(E, a));
+		g.addRule(new Rule(E, b));
+
+		Category L = new Category("L", false);
+		g.addRule(new Rule(L, L, E));
+		g.addRule(new Rule(L));
+
+		Category[] str = {};
+		EarleyParser parser = new EarleyParser(g);
+		SPPFNode root = parser.parse(str, L);
+		assertNotNull(root);
+		Util.dumpParseResult("testParseList-bt.dot", root, g);
+
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+
+		Util.dumpParseResult("testParseList.dot", root, g);
+	}
+
+	@Test public void testParseEmptyList() {
+		Grammar g = new Grammar();
+		Category a = new Category("a", true);
+		Category b = new Category("b", true);
+
+		Category E = new Category("LE", false);
+		g.addRule(new Rule(E, a));
+		g.addRule(new Rule(E, b));
+
+		Category L = new Category("L", false);
+		g.addRule(new Rule(L, E));
+		g.addRule(new Rule(L, L, E));
+
+		Category LO = new Category("LO", false);
+		g.addRule(new Rule(LO));
+		g.addRule(new Rule(LO, L));
+
+
+		Category[] str = {};
+		EarleyParser parser = new EarleyParser(g);
+		SPPFNode root = parser.parse(str, LO);
+		assertNotNull(root);
+		Util.dumpParseResult("testParseEmptyList-bt.dot", root, g);
+
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+
+		Util.dumpParseResult("testParseEmptyList.dot", root, g);
+	}
+
+
+	@Test public void testParseEmptyListPrefix() {
+		Grammar g = new Grammar();
+		Category a = new Category("a", true);
+		Category b = new Category("b", true);
+
+		Category E = new Category("LE", false);
+		g.addRule(new Rule(E, a));
+		g.addRule(new Rule(E, b));
+
+		Category L = new Category("L", false);
+		g.addRule(new Rule(L, E));
+		g.addRule(new Rule(L, L, E));
+
+		Category LO = new Category("LO", false);
+		g.addRule(new Rule(LO));
+		g.addRule(new Rule(LO, L));
+
+		Category P = new Category("P", false);
+		Category p = new Category("p", true);
+		g.addRule(new Rule(P, p));
+
+		Category PLO = new Category("PLO", false);
+		g.addRule(new Rule(PLO, P, LO));
+
+
+		Category[] str = {p};
+		EarleyParser parser = new EarleyParser(g);
+		SPPFNode root = parser.parse(str, PLO);
+
+		assertNotNull(root);
+		Util.dumpParseResult("testParseEmptyListPrefix-bt.dot", root, g);
+
+		SPPFDebinarizeVisitor dbv = new SPPFDebinarizeVisitor();
+		dbv.visit(root);
+
+		Util.dumpParseResult("testParseEmptyListPrefix.dot", root, g);
+	}
+
 }
