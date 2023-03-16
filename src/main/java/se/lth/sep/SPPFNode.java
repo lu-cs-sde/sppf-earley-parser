@@ -2,6 +2,7 @@ package se.lth.sep;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class SPPFNode {
@@ -83,7 +84,7 @@ public class SPPFNode {
 		}
 	}
 
-	HashSet<FamilyNode> children = new HashSet<>();
+	HashSet<FamilyNode> children = new LinkedHashSet<>();
 	private NodeLabel label;
 	private Object info = null;
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -31,7 +32,7 @@ public class EarleyParser {
 		return grammar.toString();
 	}
 
-	static class StateSet extends HashSet<EarleyItem> {
+	static class StateSet extends LinkedHashSet<EarleyItem> {
 		public StateSet(Collection<EarleyItem> c) {
 			super(c);
 		}
