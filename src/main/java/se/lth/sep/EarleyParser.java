@@ -3,7 +3,6 @@ package se.lth.sep;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -190,7 +189,7 @@ public class EarleyParser {
 					}
 
 					// this set is needed to avoid concurrent modification which occurs when Lambda.start == i
-					HashSet<EarleyItem> RTemp = new HashSet<>();
+					LinkedHashSet<EarleyItem> RTemp = new LinkedHashSet<>();
 					for (EarleyItem item : state[Lambda.start]) { // 2.3
 						if (!item.isComplete() && item.afterDot() == Lambda.rule.r.head) {
 							EarleyItem itemNext = item.advance();
